@@ -89,6 +89,8 @@ namespace CoreAsync
         return m_connections.size();
     }
 
+    std::atomic<bool> TA_ConnectionResponder::m_enableConsume {true};
+
     TA_ConnectionResponder & TA_ConnectionResponder::GetIns()
     {
         static TA_ConnectionResponder responder;

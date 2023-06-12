@@ -152,7 +152,7 @@ namespace CoreAsync
 
     private:
         ActivityQueue m_queue {};
-        std::atomic<bool> m_enableConsume {true};
+        static std::atomic<bool> m_enableConsume;
 
     };
 

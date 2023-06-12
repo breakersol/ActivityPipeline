@@ -54,7 +54,7 @@ add_library(AsyncPipeline SHARED
     Src/Components/TA_MetaObject.h
     Src/Components/TA_MetaReflex.h
     Src/Components/TA_MetaStringView.h
-
+    Src/Components/TA_ThreadPool.h
 )
 
 target_compile_definitions(AsyncPipeline PRIVATE ASYNCPIPELINE_LIBRARY)
