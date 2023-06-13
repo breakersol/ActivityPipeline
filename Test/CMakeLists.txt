@@ -48,7 +48,8 @@ add_executable(PipelineTest PipelineTest/main.cpp
     PipelineTest/MetaTest.h
     PipelineTest/TA_ActivityQueueTest.cpp
     PipelineTest/TA_ActivityQueueTest.h
-
+    PipelineTest/TA_ThreadPoolTest.h
+    PipelineTest/TA_ThreadPoolTest.cpp
 )
 
 install(TARGETS PipelineTest

@@ -12,7 +12,7 @@
 namespace CoreAsync {
     class TA_ThreadPool : public TA_MetaObject
     {
-        using HighPriorityQueue = TA_ActivityQueue<TA_BasicActivity *, 128>;
+        using HighPriorityQueue = TA_ActivityQueue<TA_BasicActivity *, 1024>;
 
         struct ThreadState
         {
@@ -21,7 +21,7 @@ namespace CoreAsync {
         };
 
     public:
-        explicit TA_ThreadPool(std::size_t size = std::thread::hardware_concurrency()) : m_states(size), m_threads(size)
+        explicit TA_ThreadPool(std::size_t size = std::thread::hardware_concurrency()) : m_states(size)
         {
             init();
         }
@@ -46,7 +46,7 @@ namespace CoreAsync {
             }
         }
 
-        bool postActivity(TA_BasicActivity *&pActivity)
+        bool postActivity(TA_BasicActivity *pActivity)
         {
             if(!pActivity)
                 return false;
@@ -63,7 +63,7 @@ namespace CoreAsync {
             return false;
         }
 
-        bool sendActivity(TA_BasicActivity *&pActivity)
+        bool sendActivity(TA_BasicActivity *pActivity)
         {
             if(!pActivity)
                 return false;
@@ -77,15 +77,20 @@ namespace CoreAsync {
             return false;
         }
 
+        std::size_t size() const
+        {
+            return m_threads.size();
+        }
+
     private:
         void init()
         {
-            for(std::size_t idx = 0; idx < m_threads.size();++idx)
+            for(std::size_t idx = 0; idx < m_states.size();++idx)
             {
-                if(idx == m_threads.size() - 1)
+                if(idx == m_states.size() - 1)
                 {
                     m_threads.emplace_back(
-                        [&](const std::stop_token &st) {
+                        [&, idx](const std::stop_token &st) {
                             TA_BasicActivity *pActivity {nullptr};
                             while (!st.stop_requested()) {
                                 m_states[idx].resource.acquire();
@@ -100,13 +105,14 @@ namespace CoreAsync {
                                 }
                                 m_states[idx].m_isBusy.store(false, std::memory_order_release);
                             }
+                            std::printf("Shut down successuflly!\n");
                         }
                     );
                 }
                 else
                 {
                     m_threads.emplace_back(
-                        [&](const std::stop_token &st) {
+                        [&, idx](const std::stop_token &st) {
                             TA_BasicActivity *pActivity {nullptr};
                             while (!st.stop_requested()) {
                                 m_states[idx].resource.acquire();
@@ -116,11 +122,12 @@ namespace CoreAsync {
                                     if(m_activityQueue.pop(pActivity) && pActivity)
                                     {
                                         (*pActivity)();
-                                        pActivity = nullptr;
+                                        pActivity = nullptr;     
                                     }
                                 }
                                 m_states[idx].m_isBusy.store(false, std::memory_order_release);
                             }
+                            std::printf("Shut down successuflly!\n");
                         }
                     );
                 }

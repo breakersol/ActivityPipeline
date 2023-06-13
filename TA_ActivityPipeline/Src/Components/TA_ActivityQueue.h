@@ -112,7 +112,7 @@ namespace CoreAsync
 
     };
 
-    using ActivityQueue = TA_ActivityQueue<TA_BasicActivity *, 1024>;
+    using ActivityQueue = TA_ActivityQueue<TA_BasicActivity *, 10240>;
 }
 
 #endif // TA_ACTIVITYQUEUE_H
