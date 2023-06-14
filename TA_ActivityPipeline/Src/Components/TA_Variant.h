@@ -73,7 +73,7 @@ namespace CoreAsync {
         }
 
         template <typename VAR>
-        constexpr bool isSameType()
+        constexpr bool isSameType() const
         {
             return typeid (VAR).hash_code() == m_typeId;
         }
