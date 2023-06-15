@@ -73,12 +73,12 @@ namespace CoreAsync {
         }
 
         template <typename VAR>
-        constexpr bool isSameType() const
+        bool isSameType() const
         {
             return typeid (VAR).hash_code() == m_typeId;
         }
 
-        constexpr std::size_t typeId() const
+        std::size_t typeId() const
         {
             return m_typeId;
         }

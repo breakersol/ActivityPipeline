@@ -4,6 +4,10 @@
 #include "gtest/gtest.h"
 #include "Components/TA_ThreadPool.h"
 
+namespace CoreAsync {
+    class TA_BasicActivity;
+}
+
 class TA_ThreadPoolTest : public :: testing :: Test
 {
 public:
@@ -14,6 +18,7 @@ public:
     void TearDown() override;
 
     CoreAsync::TA_ThreadPool m_threadPool;
+    std::array<CoreAsync::TA_BasicActivity *, 1024> activities;
 
 };
 

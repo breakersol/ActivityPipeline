@@ -1,18 +1,20 @@
 #ifndef TA_THREADPOOL_H
 #define TA_THREADPOOL_H
 
-#include "Components/TA_BasicActivity.h"
 #include "TA_MetaObject.h"
 #include "TA_ActivityQueue.h"
+#include "TA_LinkedActivity.h"
 
 #include <thread>
 #include <vector>
 #include <semaphore>
+#include <future>
 
 namespace CoreAsync {
     class TA_ThreadPool : public TA_MetaObject
     {
         using HighPriorityQueue = TA_ActivityQueue<TA_BasicActivity *, 1024>;
+        using SharedPromise = std::shared_ptr<std::promise<TA_Variant> >;
 
         struct ThreadState
         {
@@ -46,35 +48,45 @@ namespace CoreAsync {
             }
         }
 
-        bool postActivity(TA_BasicActivity *pActivity)
+        auto postActivity(TA_BasicActivity *pActivity)
         {
             if(!pActivity)
-                return false;
-            if(!m_activityQueue.push(pActivity))
-                return false;
+                return std::future<TA_Variant> {};
+            auto func = [=](SharedPromise pr)->void {
+                pr->set_value((*pActivity)());
+            };
+            SharedPromise pr {std::make_shared<std::promise<TA_Variant>>()};
+            std::future<TA_Variant> ft {pr->get_future()};
+            if(!m_activityQueue.push(new TA_LinkedActivity<LambdaType<void,SharedPromise>,INVALID_INS,void,SharedPromise>(func, std::move(pr))))
+                return std::future<TA_Variant> {};
             for(std::size_t i = 0;i < m_states.size() - 1;++i)
             {
                 if(!m_states[i].m_isBusy.load(std::memory_order_acquire))
                 {
                     m_states[i].resource.release();
-                    return true;
+                    break;
                 }
             }
-            return false;
+            return ft;
         }
 
-        bool sendActivity(TA_BasicActivity *pActivity)
+        std::future<TA_Variant> sendActivity(TA_BasicActivity *pActivity)
         {
             if(!pActivity)
-                return false;
-            if(!m_highPriorityQueue.push(pActivity))
-                return false;
+                return std::future<TA_Variant> {};
+            auto func = [=](SharedPromise pr)->void {
+                TA_Variant var = (*pActivity)();
+                pr->set_value(var);
+            };
+            SharedPromise pr {std::make_shared<std::promise<TA_Variant>>()};
+            std::future<TA_Variant> ft {pr->get_future()};
+            if(!m_highPriorityQueue.push(new TA_LinkedActivity<LambdaType<void,SharedPromise>,INVALID_INS,void,SharedPromise>(func, std::move(pr))))
+                return std::future<TA_Variant> {};
             if(!m_states.back().m_isBusy.load(std::memory_order_acquire))
             {
-                m_states.back().resource.release();
-                return true;
+                m_states.back().resource.release(); 
             }
-            return false;
+            return ft;
         }
 
         std::size_t size() const
@@ -100,6 +112,7 @@ namespace CoreAsync {
                                     if(m_highPriorityQueue.pop(pActivity) && pActivity)
                                     {
                                         (*pActivity)();
+                                        delete pActivity;
                                         pActivity = nullptr;
                                     }
                                 }
@@ -122,6 +135,7 @@ namespace CoreAsync {
                                     if(m_activityQueue.pop(pActivity) && pActivity)
                                     {
                                         (*pActivity)();
+                                        delete pActivity;
                                         pActivity = nullptr;     
                                     }
                                 }
