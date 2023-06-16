@@ -17,7 +17,6 @@ public:
     void SetUp() override;
     void TearDown() override;
 
-    CoreAsync::TA_ThreadPool m_threadPool;
     std::array<CoreAsync::TA_BasicActivity *, 1024> activities;
 
 };
