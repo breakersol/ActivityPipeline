@@ -15,6 +15,7 @@
  */
 
 #include "Components/TA_ConnectionUtils.h"
+#include "Components/TA_ThreadPool.h"
 
 #include <thread>
 
@@ -115,8 +116,7 @@ namespace CoreAsync
         switch (type) {
         case TA_ConnectionType::Async:
         {
-            std::shared_ptr<TA_BasicActivity> pSharedActivity {pActivity};
-            auto ft = std::async(std::launch::async, [pSharedActivity]()->TA_Variant {return (*pSharedActivity.get())();});
+            auto ft = TA_ThreadHolder::get().sendActivity(pActivity, true);
             return true;
         }
         case TA_ConnectionType::Sync:

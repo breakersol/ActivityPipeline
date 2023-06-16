@@ -48,12 +48,16 @@ namespace CoreAsync {
             }
         }
 
-        auto postActivity(TA_BasicActivity *pActivity)
+        auto postActivity(TA_BasicActivity *pActivity, bool autoDelete = false)
         {
             if(!pActivity)
                 return std::future<TA_Variant> {};
-            auto func = [=](SharedPromise pr)->void {
+            auto func = [pActivity, autoDelete](SharedPromise pr)->void {
                 pr->set_value((*pActivity)());
+                if(autoDelete)
+                {
+                    delete pActivity;
+                }
             };
             SharedPromise pr {std::make_shared<std::promise<TA_Variant>>()};
             std::future<TA_Variant> ft {pr->get_future()};
@@ -70,13 +74,17 @@ namespace CoreAsync {
             return ft;
         }
 
-        std::future<TA_Variant> sendActivity(TA_BasicActivity *pActivity)
+        std::future<TA_Variant> sendActivity(TA_BasicActivity *pActivity, bool autoDelete = false)
         {
             if(!pActivity)
                 return std::future<TA_Variant> {};
-            auto func = [=](SharedPromise pr)->void {
+            auto func = [pActivity, autoDelete](SharedPromise pr)->void {
                 TA_Variant var = (*pActivity)();
                 pr->set_value(var);
+                if(autoDelete)
+                {
+                    delete pActivity;
+                }
             };
             SharedPromise pr {std::make_shared<std::promise<TA_Variant>>()};
             std::future<TA_Variant> ft {pr->get_future()};
@@ -153,6 +161,15 @@ namespace CoreAsync {
         std::vector<std::jthread> m_threads;
         ActivityQueue m_activityQueue;
         HighPriorityQueue m_highPriorityQueue;
+    };
+
+    struct TA_ThreadHolder
+    {
+        static TA_ThreadPool & get()
+        {
+            static TA_ThreadPool pool;
+            return pool;
+        }
     };
 }
 

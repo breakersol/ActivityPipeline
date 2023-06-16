@@ -16,6 +16,7 @@
 
 #include "Components/TA_BasicPipeline.h"
 #include "Components/TA_CommonTools.h"
+#include "Components/TA_ThreadPool.h"
 
 #include <chrono>
 #include <cassert>
@@ -90,7 +91,7 @@ namespace CoreAsync {
         std::lock_guard<std::recursive_mutex> locker(m_mutex);
         if(type == ExecuteType::Async)
         {
-            auto ft = std::async(std::launch::async,[this]()->void{this->run();});
+            auto ft = TA_ThreadHolder::get().postActivity(new TA_LinkedActivity<LambdaTypeWithoutPara<void>, INVALID_INS,void,INVALID_INS>([this]()->void{this->run();}), true);
             std::swap(m_ft,ft);
         }
         else
