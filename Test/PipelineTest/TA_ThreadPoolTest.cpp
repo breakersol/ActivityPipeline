@@ -40,14 +40,14 @@ void TA_ThreadPoolTest::TearDown()
 TEST_F(TA_ThreadPoolTest, postActivityTest)
 {
     CoreAsync::TA_ThreadPool threadPool;
-    auto ft = threadPool.postActivity(activities[0]);
+    auto [ft,id] = threadPool.postActivity(activities[0]);
     EXPECT_EQ(0, ft.get().get<int>());
 }
 
 TEST_F(TA_ThreadPoolTest, sendActivityTest)
 {
     CoreAsync::TA_ThreadPool threadPool;
-    auto ft = threadPool.sendActivity(activities[0]);
+    auto [ft,id] = threadPool.sendActivity(activities[0]);
     EXPECT_EQ(0, ft.get().get<int>());
 }
 
@@ -60,7 +60,7 @@ TEST_F(TA_ThreadPoolTest, threadSizeTest)
 TEST_F(TA_ThreadPoolTest, notifyResultTest)
 {
     CoreAsync::TA_ThreadPool threadPool;
-    std::vector<std::future<CoreAsync::TA_Variant>> testVec;
+    std::vector<std::pair<std::shared_future<CoreAsync::TA_Variant>,std::size_t>> testVec;
     std::vector<int> validVec(1024);
     for(int i = 0;i < activities.size();++i)
     {
@@ -70,6 +70,6 @@ TEST_F(TA_ThreadPoolTest, notifyResultTest)
     EXPECT_EQ(testVec.size(), validVec.size());
     for(int i = 0;i < testVec.size();++i)
     {
-        EXPECT_EQ(testVec[i].get().get<int>(), validVec[i]);
+        EXPECT_EQ(testVec[i].first.get().get<int>(), validVec[i]);
     }
 }

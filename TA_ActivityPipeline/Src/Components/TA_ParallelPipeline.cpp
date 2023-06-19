@@ -16,11 +16,15 @@
 
 #include "Components/TA_ParallelPipeline.h"
 #include "Components/TA_CommonTools.h"
-
-#include <future>
+#include "Components/TA_ThreadPool.h"
 
 namespace CoreAsync {
-    TA_ParallelPipeline::TA_ParallelPipeline() : TA_BasicPipeline()
+    TA_ParallelPipeline::TA_ParallelPipeline() : TA_BasicPipeline(), m_ftArray(0)
+    {
+        TA_Connection::connect(&TA_ThreadHolder::get(), &TA_ThreadPool::taskCompleted, this, &TA_ParallelPipeline::asyncTaskCompleted);
+    }
+
+    TA_ParallelPipeline::~TA_ParallelPipeline()
     {
 
     }
@@ -31,24 +35,35 @@ namespace CoreAsync {
         std::size_t activitySize = m_pActivityList.size();
         if(activitySize > 0)
         {
-            std::future<TA_Variant> *pFArray = nullptr;
-            if(!m_pActivityList.empty())
-            {
-                pFArray = new std::future<TA_Variant> [activitySize];
-            }
+            m_ftArray.resize(activitySize);
             for(std::size_t i = sIndex;i < activitySize;++i)
             {
-                auto pActivity = TA_CommonTools::at<TA_BasicActivity *>(m_pActivityList, i);
-                pFArray[i] = std::async(std::launch::async,[&,pActivity]()->TA_Variant{return (*pActivity)();});
+                m_ftArray[i] = TA_ThreadHolder::get().postActivity(TA_CommonTools::at<TA_BasicActivity *>(m_pActivityList, i));
             }
             for(int index = sIndex;index < activitySize;++index)
             {
-                TA_Variant var = pFArray[index].get();
-                TA_CommonTools::replace(m_resultList, index, std::forward<TA_Variant>(var));
-                TA_Connection::active(this, &TA_ParallelPipeline::activityCompleted, index, var);;
+                m_resultList[index] = m_ftArray[index].first.get();
+
             }
-            delete [] pFArray;
-            setState(State::Ready);
         }
+    }
+
+    void TA_ParallelPipeline::asyncTaskCompleted(std::size_t id)
+    {
+        if(m_ftArray.empty())
+            return;
+        for(int i = 0;i < m_ftArray.size();++i)
+        {
+            if(m_ftArray[i].second == id)
+            {
+                m_resultList[i] = m_ftArray[i].first.get();
+                TA_Connection::active(this, &TA_ParallelPipeline::activityCompleted, i, m_resultList[i]);
+            }
+            if(m_ftArray[i].first.valid())
+            {
+                return;
+            }
+        }
+        setState(State::Ready);
     }
 }
