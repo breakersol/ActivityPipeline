@@ -148,7 +148,6 @@ namespace CoreAsync {
     private:
         std::atomic<State> m_state {State::Waiting};
         std::atomic<unsigned int> m_startIndex {0};
-        std::future<TA_Variant> m_ft;
 
     TA_Signals:
         void stateChanged(TA_BasicPipeline::State st) { std::ignore = st; };
