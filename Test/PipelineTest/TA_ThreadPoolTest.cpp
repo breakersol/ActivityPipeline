@@ -48,7 +48,7 @@ TEST_F(TA_ThreadPoolTest, sendActivityTest)
 {
     CoreAsync::TA_ThreadPool threadPool;
     auto ft = threadPool.sendActivity(activities[0]);
-    EXPECT_EQ(0, ft.get().get<int>());
+    EXPECT_EQ(0, ft.first.get().get<int>());
 }
 
 TEST_F(TA_ThreadPoolTest, threadSizeTest)

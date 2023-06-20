@@ -4,6 +4,7 @@
 #include "TA_MetaObject.h"
 #include "TA_ActivityQueue.h"
 #include "TA_LinkedActivity.h"
+#include "TA_Connection.h"
 
 #include <thread>
 #include <vector>
@@ -52,16 +53,17 @@ namespace CoreAsync {
         {
             if(!pActivity)
                 return std::make_pair(std::future<TA_Variant> {}, std::size_t {});
-            auto func = [pActivity, autoDelete](SharedPromise pr)->void {
-                pr->set_value((*pActivity)());
+            SharedPromise pr {std::make_shared<std::promise<TA_Variant>>()};
+            std::future<TA_Variant> ft {pr->get_future()};
+            auto wrapperActivity = new TA_LinkedActivity<LambdaType<TA_Variant,SharedPromise>,INVALID_INS,TA_Variant,SharedPromise>([pActivity, autoDelete](SharedPromise pr)->TA_Variant {
+                TA_Variant var = (*pActivity)();
+                pr->set_value(var);
                 if(autoDelete)
                 {
                     delete pActivity;
                 }
-            };
-            SharedPromise pr {std::make_shared<std::promise<TA_Variant>>()};
-            std::future<TA_Variant> ft {pr->get_future()};
-            auto wrapperActivity = new TA_LinkedActivity<LambdaType<void,SharedPromise>,INVALID_INS,void,SharedPromise>(func, std::move(pr));
+                return var;
+            }, std::move(pr));
             if(!m_activityQueue.push(wrapperActivity))
                 return std::make_pair(std::future<TA_Variant> {}, std::size_t {});
             for(std::size_t i = 0;i < m_states.size() - 1;++i)
@@ -72,30 +74,31 @@ namespace CoreAsync {
                     break;
                 }
             }
-            return std::make_pair(std::move(ft), wrapperActivity->id());;
+            return std::make_pair(std::move(ft), wrapperActivity->id());
         }
 
         auto sendActivity(TA_BasicActivity *pActivity, bool autoDelete = false)
         {
             if(!pActivity)
-                return std::future<TA_Variant> {};
-            auto func = [pActivity, autoDelete](SharedPromise pr)->void {
+                return std::make_pair(std::future<TA_Variant> {}, std::size_t {});
+            SharedPromise pr {std::make_shared<std::promise<TA_Variant>>()};
+            std::future<TA_Variant> ft {pr->get_future()};
+            auto wrapperActivity = new TA_LinkedActivity<LambdaType<TA_Variant,SharedPromise>,INVALID_INS,TA_Variant,SharedPromise>([pActivity, autoDelete](SharedPromise pr)->TA_Variant {
                 TA_Variant var = (*pActivity)();
                 pr->set_value(var);
                 if(autoDelete)
                 {
                     delete pActivity;
                 }
-            };
-            SharedPromise pr {std::make_shared<std::promise<TA_Variant>>()};
-            std::future<TA_Variant> ft {pr->get_future()};
-            if(!m_highPriorityQueue.push(new TA_LinkedActivity<LambdaType<void,SharedPromise>,INVALID_INS,void,SharedPromise>(func, std::move(pr))))
-                return std::future<TA_Variant> {};
+                return var;
+            }, std::move(pr));
+            if(!m_highPriorityQueue.push(wrapperActivity))
+                return std::make_pair(std::future<TA_Variant> {}, std::size_t {});
             if(!m_states.back().m_isBusy.load(std::memory_order_acquire))
             {
                 m_states.back().resource.release(); 
             }
-            return ft;
+            return std::make_pair(std::move(ft), wrapperActivity->id());
         }
 
         std::size_t size() const
@@ -120,7 +123,8 @@ namespace CoreAsync {
                                 {
                                     if(m_highPriorityQueue.pop(pActivity) && pActivity)
                                     {
-                                        (*pActivity)();
+                                        TA_Variant var = (*pActivity)();
+                                        TA_Connection::active(this, &TA_ThreadPool::highPrioritytaskCompleted, pActivity->id(), var);
                                         delete pActivity;
                                         pActivity = nullptr;
                                     }
@@ -143,7 +147,8 @@ namespace CoreAsync {
                                 {
                                     if(m_activityQueue.pop(pActivity) && pActivity)
                                     {
-                                        (*pActivity)();
+                                        TA_Variant var = (*pActivity)();
+                                        TA_Connection::active(this, &TA_ThreadPool::taskCompleted, pActivity->id(), var);
                                         delete pActivity;
                                         pActivity = nullptr;     
                                     }
@@ -156,6 +161,10 @@ namespace CoreAsync {
                 }
             }
         }
+
+    TA_Signals:
+        void taskCompleted(std::size_t id, TA_Variant var) {}
+        void highPrioritytaskCompleted(std::size_t id, TA_Variant var) {}
 
     private:
         std::vector<ThreadState> m_states;;
@@ -171,6 +180,15 @@ namespace CoreAsync {
             static TA_ThreadPool pool;
             return pool;
         }
+    };
+
+    template <>
+    struct Reflex::TA_TypeInfo<TA_ThreadPool> : TA_MetaTypeInfo<TA_ThreadPool>
+    {
+        static constexpr TA_MetaFieldList fields = {
+            TA_MetaField {&Raw::taskCompleted, META_STRING("taskCompleted")},
+            TA_MetaField {&Raw::highPrioritytaskCompleted, META_STRING("highPrioritytaskCompleted")},
+        };
     };
 }
 

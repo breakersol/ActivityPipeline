@@ -23,7 +23,7 @@
 namespace CoreAsync {
     TA_ParallelPipeline::TA_ParallelPipeline() : TA_BasicPipeline()
     {
-
+        TA_Connection::connect(&TA_ThreadHolder::get(), &TA_ThreadPool::taskCompleted, this, &TA_ParallelPipeline::taskCompleted);
     }
 
     void TA_ParallelPipeline::run()
@@ -46,5 +46,10 @@ namespace CoreAsync {
             delete [] pFArray;
             setState(State::Ready);
         }
+    }
+
+    void TA_ParallelPipeline::taskCompleted(std::size_t id, TA_Variant var)
+    {
+        std::printf("Receive completed activity id: %llu, res: %d\n", id, var.get<int>());
     }
 }

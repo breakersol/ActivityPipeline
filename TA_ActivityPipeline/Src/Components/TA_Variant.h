@@ -36,14 +36,21 @@ namespace CoreAsync {
         template<typename VAR>
         void set(VAR v)
         {
-            m_typeId = typeid (VAR).hash_code();
-            if constexpr(!std::is_pointer_v<VAR>)
+            if constexpr(std::is_same_v<VAR, TA_Variant>)
             {
-                m_ptr = std::make_shared<VAR>(v);
+                (*this) = v;
             }
             else
             {
-                m_ptr.reset(v);
+                m_typeId = typeid (VAR).hash_code();
+                if constexpr(!std::is_pointer_v<VAR>)
+                {
+                    m_ptr = std::make_shared<VAR>(v);
+                }
+                else
+                {
+                    m_ptr.reset(v);
+                }
             }
         }
 
