@@ -48,7 +48,7 @@ namespace CoreAsync {
         }
 
         template <typename VAR>
-        VAR get() const requires (!std::is_pointer<VAR>::value)
+        VAR get() requires (!std::is_pointer<VAR>::value)
         {
             if(m_typeId == typeid (VAR).hash_code())
             {
@@ -58,7 +58,7 @@ namespace CoreAsync {
         }
 
         template <typename VAR>
-        VAR get() const requires std::is_pointer<VAR>::value
+        VAR get() requires std::is_pointer<VAR>::value
         {
             if(m_typeId == typeid (VAR).hash_code())
             {

@@ -20,23 +20,18 @@
 #include "TA_BasicPipeline.h"
 
 namespace CoreAsync {
-    class ASYNC_PIPELINE_EXPORT TA_ParallelPipeline : public TA_BasicPipeline
+    class TA_ParallelPipeline : public TA_BasicPipeline
     {
     public:
-        explicit TA_ParallelPipeline();
-        virtual ~TA_ParallelPipeline();
+        explicit ASYNC_PIPELINE_EXPORT TA_ParallelPipeline();
+        virtual ~TA_ParallelPipeline(){}
 
         TA_ParallelPipeline(const TA_ParallelPipeline &activity) = delete;
         TA_ParallelPipeline(TA_ParallelPipeline &&activity) = delete;
         TA_ParallelPipeline & operator = (const TA_ParallelPipeline &) = delete;
 
-        void asyncTaskCompleted(std::size_t id);
-
     protected:
         void run() override final;
-
-    private:
-        std::vector<std::pair<std::shared_future<TA_Variant>, std::size_t> >m_ftArray;
 
     };
 
@@ -45,9 +40,7 @@ namespace CoreAsync {
         template <>
         struct ASYNC_PIPELINE_EXPORT TA_TypeInfo<TA_ParallelPipeline> : TA_MetaTypeInfo<TA_ParallelPipeline,TA_BasicPipeline>
         {
-            static constexpr TA_MetaFieldList fields = {
-                TA_MetaField {&Raw::asyncTaskCompleted, META_STRING("asyncTaskCompleted")},
-            };
+            static constexpr TA_MetaFieldList fields = {};
         };
     }
 }
