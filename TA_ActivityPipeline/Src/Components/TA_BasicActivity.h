@@ -25,6 +25,11 @@ namespace CoreAsync {
     class TA_BasicActivity
     {
     public:
+        TA_BasicActivity() : m_id(m_count.load(std::memory_order_acquire))
+        {
+            m_count.fetch_add(1);
+        }
+
         virtual ~TA_BasicActivity() = default;
 
         virtual TA_Variant operator()() = 0;
@@ -34,6 +39,15 @@ namespace CoreAsync {
         virtual bool selectBranch(std::deque<unsigned int> branches) = 0;
 
         virtual TA_Variant caller() const = 0;
+
+        std::size_t id() const
+        {
+            return m_id;
+        }
+
+    private:
+        inline static std::atomic_size_t m_count {0};
+        const std::size_t m_id;
 
     };
 }

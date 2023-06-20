@@ -74,7 +74,7 @@ namespace CoreAsync {
             return ft;
         }
 
-        std::future<TA_Variant> sendActivity(TA_BasicActivity *pActivity, bool autoDelete = false)
+        auto sendActivity(TA_BasicActivity *pActivity, bool autoDelete = false)
         {
             if(!pActivity)
                 return std::future<TA_Variant> {};
