@@ -32,15 +32,14 @@ namespace CoreAsync {
         std::size_t activitySize = m_pActivityList.size();
         if(activitySize > 0)
         {
-            std::future<TA_Variant> *pFArray = nullptr;
-            pFArray = new std::future<TA_Variant> [activitySize];
+            std::pair<std::future<TA_Variant>, std::size_t> *pFArray = new std::pair<std::future<TA_Variant>, std::size_t> [activitySize];
             for(std::size_t i = sIndex;i < activitySize;++i)
             {
                 pFArray[i] = TA_ThreadHolder::get().postActivity(TA_CommonTools::at<TA_BasicActivity *>(m_pActivityList, i));
             }
             for(int index = sIndex;index < activitySize;++index)
             {
-                TA_Variant var = pFArray[index].get();
+                TA_Variant var = pFArray[index].first.get();
                 TA_CommonTools::replace(m_resultList, index, std::forward<TA_Variant>(var));
                 TA_Connection::active(this, &TA_ParallelPipeline::activityCompleted, index, var);;
             }

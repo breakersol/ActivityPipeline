@@ -51,7 +51,7 @@ namespace CoreAsync {
         auto postActivity(TA_BasicActivity *pActivity, bool autoDelete = false)
         {
             if(!pActivity)
-                return std::future<TA_Variant> {};
+                return std::make_pair(std::future<TA_Variant> {}, std::size_t {});
             auto func = [pActivity, autoDelete](SharedPromise pr)->void {
                 pr->set_value((*pActivity)());
                 if(autoDelete)
@@ -61,8 +61,9 @@ namespace CoreAsync {
             };
             SharedPromise pr {std::make_shared<std::promise<TA_Variant>>()};
             std::future<TA_Variant> ft {pr->get_future()};
-            if(!m_activityQueue.push(new TA_LinkedActivity<LambdaType<void,SharedPromise>,INVALID_INS,void,SharedPromise>(func, std::move(pr))))
-                return std::future<TA_Variant> {};
+            auto wrapperActivity = new TA_LinkedActivity<LambdaType<void,SharedPromise>,INVALID_INS,void,SharedPromise>(func, std::move(pr));
+            if(!m_activityQueue.push(wrapperActivity))
+                return std::make_pair(std::future<TA_Variant> {}, std::size_t {});
             for(std::size_t i = 0;i < m_states.size() - 1;++i)
             {
                 if(!m_states[i].m_isBusy.load(std::memory_order_acquire))
@@ -71,7 +72,7 @@ namespace CoreAsync {
                     break;
                 }
             }
-            return ft;
+            return std::make_pair(std::move(ft), wrapperActivity->id());;
         }
 
         auto sendActivity(TA_BasicActivity *pActivity, bool autoDelete = false)

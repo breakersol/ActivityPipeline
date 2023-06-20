@@ -41,7 +41,7 @@ TEST_F(TA_ThreadPoolTest, postActivityTest)
 {
     CoreAsync::TA_ThreadPool threadPool;
     auto ft = threadPool.postActivity(activities[0]);
-    EXPECT_EQ(0, ft.get().get<int>());
+    EXPECT_EQ(0, ft.first.get().get<int>());
 }
 
 TEST_F(TA_ThreadPoolTest, sendActivityTest)
@@ -64,7 +64,7 @@ TEST_F(TA_ThreadPoolTest, notifyResultTest)
     std::vector<int> validVec(1024);
     for(int i = 0;i < activities.size();++i)
     {
-        testVec.emplace_back(threadPool.postActivity(activities[i]));
+        testVec.emplace_back(threadPool.postActivity(activities[i]).first);
         validVec[i] = i;
     }
     EXPECT_EQ(testVec.size(), validVec.size());
