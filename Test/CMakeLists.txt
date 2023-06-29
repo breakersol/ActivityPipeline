@@ -33,11 +33,10 @@ add_executable(PipelineTest
 )
 
 include_directories(../TA_ActivityPipeline/Src)
-include_directories(./ThirdParty/googletest/googletest/include)
-
-message(STATUS "Current compiler id: ${CMAKE_CXX_COMPILER_ID}" )
+include_directories(../ThirdParty/googletest/googletest/include)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    message(STATUS "Configuring for MSVC")
     target_link_libraries(PipelineTest PRIVATE
         $<$<CONFIG:Debug>:AsyncPipeline_d>
         $<$<CONFIG:Release>:AsyncPipeline>
