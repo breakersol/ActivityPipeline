@@ -66,6 +66,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     )
 
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    message(STATUS "Configuring for GNU")
     link_libraries(AsyncPipeline)
     link_directories(ThirdParty/googletest/output)
     link_libraries(gtest)
