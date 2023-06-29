@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include_directories(../TA_ActivityPipeline/Src)
 include_directories(./ThirdParty/googletest/googletest/include)
-link_directories(../build/TA_ActivityPipeline/output)
+# link_directories(../build/TA_ActivityPipeline/output)
 
 add_executable(PipelineTest PipelineTest/main.cpp
     PipelineTest/TA_ActivityTest.cpp
@@ -68,11 +68,22 @@ if(MSVC)
     #         "$<IF:$<CONFIG:Release>,${DLL_TARGET_DIR}/Release,${DLL_TARGET_DIR}/Debug>"
     # )
 else()
-    link_libraries(AsyncPipeline)
-    link_directories(ThirdParty/googletest/output)
+    # link_libraries(AsyncPipeline)
+    # link_directories(ThirdParty/googletest/output)
+
+    target_link_libraries(PipelineTest PRIVATE
+        $<$<CONFIG:Debug>:AsyncPipeline>
+        $<$<CONFIG:Release>:AsyncPipeline>
+    )
+    target_link_libraries(PipelineTest PRIVATE
+        $<$<CONFIG:Debug>:gtest>
+        $<$<CONFIG:Release>:gtest>
+    )
+    target_link_directories(PipelineTest PRIVATE ThirdParty/googletest/output)
+    target_link_directories(PipelineTest PRIVATE ../build/TA_ActivityPipeline/output)
 endif()
 
-link_libraries(gtest)
+# link_libraries(gtest)
 
 install(TARGETS PipelineTest
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
