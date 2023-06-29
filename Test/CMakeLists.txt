@@ -33,7 +33,7 @@ add_executable(PipelineTest
 )
 
 include_directories(../TA_ActivityPipeline/Src)
-include_directories(../ThirdParty/googletest/googletest/include)
+include_directories(./ThirdParty/googletest/googletest/include)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     message(STATUS "Configuring for MSVC")
@@ -68,9 +68,9 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     message(STATUS "Configuring for GNU")
-    link_libraries(AsyncPipeline)
+    link_libraries(libAsyncPipeline)
     link_directories(ThirdParty/googletest/output)
-    link_libraries(gtest)
+    link_libraries(libgtest)
     link_directories(../build/TA_ActivityPipeline/output)
 endif()
 
