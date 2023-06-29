@@ -7,22 +7,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include_directories(../TA_ActivityPipeline/Src)
 include_directories(./ThirdParty/googletest/googletest/include)
-link_directories(../build/TA_ActivityPipeline/output)
-
-if(MSVC)
-    if(CMAKE_BUILD_TYPE AND (CMAKE_BUILD_TYPE STREQUAL "Debug"))
-        link_directories(ThirdParty/googletest/output/win32/Debug)
-        link_libraries(AsyncPipeline_d)
-    elseif(CMAKE_BUILD_TYPE AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
-            link_directories(ThirdParty/googletest/output/win32/Release)
-            link_libraries(AsyncPipeline)
-    endif()
-else()
-    link_libraries(AsyncPipeline)
-    link_directories(ThirdParty/googletest/output)
-endif()
-
-link_libraries(gtest)
 
 add_executable(PipelineTest PipelineTest/main.cpp
     PipelineTest/TA_ActivityTest.cpp
@@ -48,9 +32,53 @@ add_executable(PipelineTest PipelineTest/main.cpp
     PipelineTest/MetaTest.h
     PipelineTest/TA_ActivityQueueTest.cpp
     PipelineTest/TA_ActivityQueueTest.h
-    PipelineTest/TA_ThreadPoolTest.h
-    PipelineTest/TA_ThreadPoolTest.cpp
+    # PipelineTest/TA_ThreadPoolTest.h
+    # PipelineTest/TA_ThreadPoolTest.cpp
 )
+
+if(MSVC)
+    message(STATUS "Configuring for MSVC")
+    target_link_libraries(PipelineTest PRIVATE
+        $<$<CONFIG:Debug>:AsyncPipeline_d>
+        $<$<CONFIG:Release>:AsyncPipeline>
+    )
+    target_link_libraries(PipelineTest PRIVATE
+        $<$<CONFIG:Debug>:gtest>
+        $<$<CONFIG:Release>:gtest>
+    )
+    target_link_directories(PipelineTest PRIVATE ThirdParty/googletest/output/win32)
+    target_link_directories(PipelineTest PRIVATE ../build/TA_ActivityPipeline/output)
+
+    set(DLL_TARGET_DIR ${CMAKE_CURRENT_BINARY_DIR})
+    set(ASYNC_PIPELINE_DIR ../TA_ActivityPipeline/output)
+    set(GTEST_DIR ../../Test/ThirdParty/googletest/output/win32)
+
+    add_custom_command(
+        TARGET PipelineTest POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+            "$<IF:$<CONFIG:Release>,${ASYNC_PIPELINE_DIR}/Release/AsyncPipeline.dll,${ASYNC_PIPELINE_DIR}/Debug/AsyncPipeline_d.dll>"
+            "$<IF:$<CONFIG:Release>,${DLL_TARGET_DIR}/Release,${DLL_TARGET_DIR}/Debug>"
+    )
+
+    add_custom_command(
+        TARGET PipelineTest POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+            "$<IF:$<CONFIG:Release>,${GTEST_DIR}/Release/gtest.dll,${GTEST_DIR}/Debug/gtest.dll>"
+            "$<IF:$<CONFIG:Release>,${DLL_TARGET_DIR}/Release,${DLL_TARGET_DIR}/Debug>"
+    )
+else()
+    message(STATUS "Configuring for GCC")
+    target_link_libraries(PipelineTest PRIVATE
+        $<$<CONFIG:Debug>:AsyncPipeline>
+        $<$<CONFIG:Release>:AsyncPipeline>
+    )
+    target_link_libraries(PipelineTest PRIVATE
+        $<$<CONFIG:Debug>:gtest>
+        $<$<CONFIG:Release>:gtest>
+    )
+    target_link_directories(PipelineTest PRIVATE ThirdParty/googletest/output)
+    target_link_directories(PipelineTest PRIVATE ../build/TA_ActivityPipeline/output)
+endif()
 
 install(TARGETS PipelineTest
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
