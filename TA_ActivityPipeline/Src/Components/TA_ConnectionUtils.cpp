@@ -114,12 +114,12 @@ namespace CoreAsync
         if(!pActivity)
             return false;
         switch (type) {
-        case TA_ConnectionType::Async:
+        case TA_ConnectionType::Direct:
         {
             auto ft = TA_ThreadHolder::get().sendActivity(pActivity, true);
             return true;
         }
-        case TA_ConnectionType::Sync:
+        case TA_ConnectionType::Queued:
         {
             return m_queue.push(pActivity);
         }
