@@ -25,7 +25,6 @@
 #include "TA_ReceiverObject.h"
 #include "TA_MetaObject.h"
 #include "TA_ActivityQueue.h"
-#include "TA_ThreadPool.h"
 
 #define TA_Signals  public  
 
