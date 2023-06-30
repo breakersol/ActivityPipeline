@@ -200,17 +200,14 @@ namespace CoreAsync {
         }
     };
 
-    namespace Reflex
+    template <>
+    struct Reflex::TA_TypeInfo<TA_ThreadPool> : TA_MetaTypeInfo<TA_ThreadPool>
     {
-        template <>
-        struct TA_TypeInfo<TA_ThreadPool> : TA_MetaTypeInfo<TA_ThreadPool>
-        {
-            static constexpr TA_MetaFieldList fields = {
-                TA_MetaField {&Raw::taskCompleted, META_STRING("taskCompleted")},
-                TA_MetaField {&Raw::highPrioritytaskCompleted, META_STRING("highPrioritytaskCompleted")}
-            };
+        static constexpr TA_MetaFieldList fields = {
+            TA_MetaField {&Raw::taskCompleted, META_STRING("taskCompleted")},
+            TA_MetaField {&Raw::highPrioritytaskCompleted, META_STRING("highPrioritytaskCompleted")},
         };
-    }
+    };
 }
 
 #endif // TA_THREADPOOL_H
