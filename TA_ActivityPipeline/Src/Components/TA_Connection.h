@@ -23,7 +23,7 @@ namespace CoreAsync {
     class TA_Connection
     {
     public:
-        template <TA_ConnectionType type = TA_ConnectionType::Sync, EnableConnectObjectType Sender, typename SenderFunc, EnableConnectObjectType Receiver, typename ReceiverFunc>
+        template <TA_ConnectionType type = TA_ConnectionType::Queued, EnableConnectObjectType Sender, typename SenderFunc, EnableConnectObjectType Receiver, typename ReceiverFunc>
         static constexpr bool connect(Sender *pSender, SenderFunc &&sFunc, Receiver *pReceiver, ReceiverFunc &&rFunc)
         {
             if constexpr(!Reflex::TA_MemberTypeTrait<SenderFunc>::noneStaticMemberFuncFlag || !Reflex::TA_MemberTypeTrait<ReceiverFunc>::noneStaticMemberFuncFlag || !IsReturnTypeEqual<void,SenderFunc,std::is_same>::value)
