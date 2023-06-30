@@ -28,7 +28,7 @@
 #include <future>
 
 namespace CoreAsync {
-    class TA_ThreadPool : public TA_MetaObject
+    class ASYNC_PIPELINE_EXPORT TA_ThreadPool : public TA_MetaObject
     {
         using HighPriorityQueue = TA_ActivityQueue<TA_BasicActivity *, 1024>;
         using SharedPromise = std::shared_ptr<std::promise<TA_Variant> >;
