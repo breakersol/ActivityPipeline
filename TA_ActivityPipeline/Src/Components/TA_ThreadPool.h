@@ -28,7 +28,7 @@
 #include <future>
 
 namespace CoreAsync {
-    class ASYNC_PIPELINE_EXPORT TA_ThreadPool : public TA_MetaObject
+    class TA_ThreadPool : public TA_MetaObject
     {
         using HighPriorityQueue = TA_ActivityQueue<TA_BasicActivity *, 1024>;
         using SharedPromise = std::shared_ptr<std::promise<TA_Variant> >;
@@ -201,11 +201,11 @@ namespace CoreAsync {
     };
 
     template <>
-    struct ASYNC_PIPELINE_EXPORT Reflex::TA_TypeInfo<TA_ThreadPool> : TA_MetaTypeInfo<TA_ThreadPool>
+    struct Reflex::TA_TypeInfo<TA_ThreadPool> : TA_MetaTypeInfo<TA_ThreadPool>
     {
         static constexpr TA_MetaFieldList fields = {
             TA_MetaField {&Raw::taskCompleted, META_STRING("taskCompleted")},
-            TA_MetaField {&Raw::highPrioritytaskCompleted, META_STRING("highPrioritytaskCompleted")},
+            TA_MetaField {&Raw::highPrioritytaskCompleted, META_STRING("highPrioritytaskCompleted")}
         };
     };
 }
