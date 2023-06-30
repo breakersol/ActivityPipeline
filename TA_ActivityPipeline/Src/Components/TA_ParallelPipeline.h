@@ -24,7 +24,7 @@ namespace CoreAsync {
     {
     public:
         TA_ParallelPipeline();
-        virtual ~TA_ParallelPipeline(){}
+        virtual ~TA_ParallelPipeline() {}
 
         TA_ParallelPipeline(const TA_ParallelPipeline &activity) = delete;
         TA_ParallelPipeline(TA_ParallelPipeline &&activity) = delete;
@@ -34,6 +34,10 @@ namespace CoreAsync {
 
     protected:
         void run() override final;
+
+    private:
+        std::vector<std::size_t> m_activityIds;
+        std::size_t m_waitingCount;
 
     };
 

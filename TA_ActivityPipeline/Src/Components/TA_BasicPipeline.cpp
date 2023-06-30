@@ -91,7 +91,7 @@ namespace CoreAsync {
         std::lock_guard<std::recursive_mutex> locker(m_mutex);
         if(type == ExecuteType::Async)
         {
-            auto ft = TA_ThreadHolder::get().postActivity(new TA_LinkedActivity<LambdaTypeWithoutPara<void>, INVALID_INS,void,INVALID_INS>([this]()->void{this->run();}), true);
+            auto handle = TA_ThreadHolder::get().postActivity(new TA_LinkedActivity<LambdaTypeWithoutPara<void>, INVALID_INS,void,INVALID_INS>([this]()->void{this->run();}), true);
         }
         else
         {

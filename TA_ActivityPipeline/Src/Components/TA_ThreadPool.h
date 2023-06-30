@@ -191,6 +191,8 @@ namespace CoreAsync {
 
     struct TA_ThreadHolder
     {
+        using Handle = std::pair<std::future<TA_Variant>, std::size_t>;
+
         static TA_ThreadPool & get()
         {
             static TA_ThreadPool pool;
