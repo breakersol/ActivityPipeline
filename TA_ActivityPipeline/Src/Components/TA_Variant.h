@@ -16,6 +16,7 @@
 
 #ifndef TA_VARIANT_H
 #define TA_VARIANT_H
+
 #include <typeinfo>
 #include <memory>
 
