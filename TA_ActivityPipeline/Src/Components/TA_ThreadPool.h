@@ -124,7 +124,7 @@ namespace CoreAsync {
 
     private:
         void init()
-        {
+        {       
             for(std::size_t idx = 0; idx < m_states.size();++idx)
             {
                 if(idx == m_states.size() - 1)
@@ -167,6 +167,16 @@ namespace CoreAsync {
                                         TA_Connection::active(this, &TA_ThreadPool::taskCompleted, pActivity->id(), var);
                                         delete pActivity;
                                         pActivity = nullptr;     
+                                    }
+                                }
+                                if(m_states[m_states.size() - 1].m_isBusy.load(std::memory_order_acquire))
+                                {
+                                    if(m_highPriorityQueue.pop(pActivity) && pActivity)
+                                    {
+                                        TA_Variant var = (*pActivity)();
+                                        TA_Connection::active(this, &TA_ThreadPool::highPrioritytaskCompleted, pActivity->id(), var);
+                                        delete pActivity;
+                                        pActivity = nullptr;
                                     }
                                 }
                                 m_states[idx].m_isBusy.store(false, std::memory_order_release);
