@@ -1,7 +1,6 @@
 #include "TA_BasePipelineTest.h"
 #include "ITA_ActivityCreator.h"
 #include "ITA_PipelineCreator.h"
-#include "Components/TA_ThreadPool.h"
 
 TA_BasePipelineTest::TA_BasePipelineTest()
 {
@@ -20,7 +19,6 @@ void TA_BasePipelineTest::SetUp()
 
 void TA_BasePipelineTest::TearDown()
 {
-    CoreAsync::TA_ThreadHolder::get().shutDown();
     if(m_pTest)
         delete m_pTest;
     m_pTest = nullptr;

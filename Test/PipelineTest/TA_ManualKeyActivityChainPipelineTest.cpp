@@ -1,7 +1,6 @@
 #include "TA_ManualKeyActivityChainPipelineTest.h"
 #include "ITA_ActivityCreator.h"
 #include "ITA_PipelineCreator.h"
-#include "Components/TA_ThreadPool.h"
 
 TA_ManualKeyActivityChainPipelineTest::TA_ManualKeyActivityChainPipelineTest()
 {
@@ -20,7 +19,6 @@ void TA_ManualKeyActivityChainPipelineTest::SetUp()
 
 void TA_ManualKeyActivityChainPipelineTest::TearDown()
 {
-    CoreAsync::TA_ThreadHolder::get().shutDown();
     if(m_pTest)
         delete m_pTest;
     m_pTest = nullptr;
