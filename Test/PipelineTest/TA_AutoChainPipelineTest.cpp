@@ -1,6 +1,7 @@
 #include "TA_AutoChainPipelineTest.h"
 #include "ITA_ActivityCreator.h"
 #include "ITA_PipelineCreator.h"
+#include "Components/TA_ThreadPool.h"
 
 TA_AutoChainPipelineTest::TA_AutoChainPipelineTest()
 {
@@ -19,6 +20,7 @@ void TA_AutoChainPipelineTest::SetUp()
 
 void TA_AutoChainPipelineTest::TearDown()
 {
+    CoreAsync::TA_ThreadHolder::get().shutDown();
     if(m_pTest)
         delete m_pTest;
     m_pTest = nullptr;

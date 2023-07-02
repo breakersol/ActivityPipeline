@@ -1,6 +1,7 @@
 #include "TA_ConnectionTest.h"
 #include "ITA_Connection.h"
 #include "MetaTest.h"
+#include "Components/TA_ThreadPool.h"
 
 TA_ConnectionTest::TA_ConnectionTest()
 {
@@ -22,6 +23,7 @@ void TA_ConnectionTest::TearDown()
 //    if(m_pTest)
 //        delete m_pTest;
 //    m_pTest = nullptr;
+    CoreAsync::TA_ThreadHolder::get().shutDown();
 }
 
 TEST_F(TA_ConnectionTest, connectSyncTest)

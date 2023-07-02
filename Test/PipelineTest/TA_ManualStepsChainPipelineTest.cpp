@@ -1,6 +1,7 @@
 #include "TA_ManualStepsChainPipelineTest.h"
 #include "ITA_ActivityCreator.h"
 #include "ITA_PipelineCreator.h"
+#include "Components/TA_ThreadPool.h"
 
 TA_ManualStepsChainPipelineTest::TA_ManualStepsChainPipelineTest()
 {
@@ -19,6 +20,7 @@ void TA_ManualStepsChainPipelineTest::SetUp()
 
 void TA_ManualStepsChainPipelineTest::TearDown()
 {
+    CoreAsync::TA_ThreadHolder::get().shutDown();
     if(m_pTest)
         delete m_pTest;
     m_pTest = nullptr;
