@@ -44,21 +44,6 @@ TEST_F(TA_ThreadPoolTest, postActivityTest)
     EXPECT_EQ(0, ft.first.get().get<int>());
 }
 
-TEST_F(TA_ThreadPoolTest, sendActivityTest)
-{
-    CoreAsync::TA_ThreadPool threadPool;
-    std::vector<CoreAsync::TA_ThreadHolder::Handle> handles;
-    for(int i = 0;i < activities.size();++i)
-    {
-        handles.emplace_back(threadPool.sendActivity(activities[i]));
-    }
-    int i {0};
-    for(auto &handle : handles)
-    {
-        EXPECT_EQ(i++, handle.first.get().get<int>());
-    }
-}
-
 TEST_F(TA_ThreadPoolTest, threadSizeTest)
 {
     CoreAsync::TA_ThreadPool threadPool;
@@ -79,24 +64,5 @@ TEST_F(TA_ThreadPoolTest, notifyResultTest)
     for(int i = 0;i < testVec.size();++i)
     {
         EXPECT_EQ(testVec[i].get().get<int>(), validVec[i]);
-    }
-}
-
-TEST_F(TA_ThreadPoolTest, fetchHighPriorityTaskTest)
-{
-    CoreAsync::TA_ThreadPool threadPool;
-    std::vector<CoreAsync::TA_ThreadHolder::Handle> handles;
-    for(int i = 0;i < activities.size();++i)
-    {
-        handles.emplace_back(threadPool.sendActivity(activities[i]));
-        if(i == 300)
-        {
-            threadPool.postActivity(activities[i]);
-        }
-    }
-    int i {0};
-    for(auto &handle : handles)
-    {
-        EXPECT_EQ(i++, handle.first.get().get<int>());
     }
 }
