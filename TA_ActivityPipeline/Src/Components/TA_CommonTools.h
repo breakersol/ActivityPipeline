@@ -18,6 +18,9 @@
 #define TA_COMMONTOOLS_H
 
 #include <list>
+#include <string>
+
+#include "TA_MacroDefine.h"
 
 namespace CoreAsync
 {
@@ -78,6 +81,14 @@ namespace CoreAsync
 			container.erase(pIter);
 			return true;
 		}
+
+        template <typename Text, typename ...Paras>
+        static void debugInfo(Text str, Paras &&...paras)
+        {
+#ifdef  DEBUG_INFO_ON
+            std::printf(std::string_view {Text::data()}.data(), paras...);
+#endif
+        }
 	};
 }
 

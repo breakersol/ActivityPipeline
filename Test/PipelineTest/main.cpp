@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
     return RUN_ALL_TESTS();
 
 //    static CoreAsync::TA_ThreadPool theadPool;
-//    std::function<void()> func = []() {std::printf("123456");};
+//    std::function<void()> func = []() {TA_CommonTools::debugInfo("123456");};
 //    auto activity = CoreAsync::ITA_ActivityCreator::create(func);
 //    theadPool.postActivity(activity);
 

@@ -7,18 +7,19 @@
 #include "Components/TA_MetaReflex.h"
 #include "Components/TA_MetaObject.h"
 #include "Components/TA_ConnectionUtils.h"
+#include "Components/TA_CommonTools.h"
 
 class TestA : public virtual CoreAsync::TA_MetaObject
 {
 public:
-    void print() {std::printf("We are the champion\n");}
+    void print() {CoreAsync::TA_CommonTools::debugInfo(META_STRING("We are the champion\n"));}
 
 };
 
 class TestB : public virtual CoreAsync::TA_MetaObject
 {
 public:
-    void deduct() {std::printf("We are superman\n");}
+    void deduct() {CoreAsync::TA_CommonTools::debugInfo(META_STRING("We are superman\n"));}
 };
 
 class BaseTest : public TestA
@@ -27,7 +28,7 @@ public:
     int sub(int a, int b)
     {
         int res = a - b;
-        std::printf("sub: %d\n", res);
+        CoreAsync::TA_CommonTools::debugInfo(META_STRING("sub: %d\n"), res);
         return res;
     }
 };
@@ -74,7 +75,7 @@ public:
 
     void productMM(int a, int b)
     {
-        std::printf("The numbers are: %d, %d\n.",a,b);
+        CoreAsync::TA_CommonTools::debugInfo(META_STRING("The numbers are: %d, %d\n."),a,b);
     }
 
     int xx {3};

@@ -24,6 +24,7 @@
 #include "TA_ManualKeyActivityChainPipeline.h"
 #include "TA_TypeList.h"
 #include "TA_MetaReflex.h"
+#include "TA_CommonTools.h"
 
 namespace CoreAsync {
 
@@ -133,7 +134,7 @@ namespace CoreAsync {
         void pipelineStateChanged(TA_BasicPipeline::State state) { std::ignore = state; };
         void pipelineReady() {}
         void activityCompleted(unsigned int index, TA_Variant var) {
-            std::printf("Activity completed: %d\n",index);
+            TA_CommonTools::debugInfo(META_STRING("Activity completed: %d\n"),index);
         };
 
     protected:
