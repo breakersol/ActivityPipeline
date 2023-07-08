@@ -31,7 +31,6 @@
 namespace CoreAsync {
     class TA_ThreadPool : public TA_MetaObject
     {
-        using HighPriorityQueue = TA_ActivityQueue<TA_BasicActivity *, 1024>;
         using SharedPromise = std::shared_ptr<std::promise<TA_Variant> >;
 
         struct ThreadState
@@ -127,7 +126,7 @@ namespace CoreAsync {
                             }
                             m_states[idx].m_isBusy.store(false, std::memory_order_release);
                         }
-                        std::printf("Shut down successuflly!\n");
+                        TA_CommonTools::debugInfo(META_STRING("Shut down successuflly!\n"));
                     }
                 );
             }
