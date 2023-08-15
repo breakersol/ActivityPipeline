@@ -37,6 +37,8 @@ add_executable(PipelineTest PipelineTest/main.cpp
     PipelineTest/TA_ActivityQueueTest.h
     PipelineTest/TA_ThreadPoolTest.h
     PipelineTest/TA_ThreadPoolTest.cpp
+    PipelineTest/TA_CommonToolsTest.h
+    PipelineTest/TA_CommonToolsTest.cpp
 )
 
 if(MSVC)

@@ -89,6 +89,22 @@ namespace CoreAsync
             std::printf(std::string_view{Text::data()}.data(), paras...);
 #endif
         }
+
+        template <typename Num = std::int_fast64_t>
+        static std::string decimalToBinary(Num n) {
+            static std::string zero {"0"}, one {"1"};
+            if (n == 0) {
+                return zero;
+            }
+
+            std::string binary = "";
+            while (n > 0) {
+                binary = (n % 2 == 0 ? zero : one) + binary;
+                n /= 2;
+            }
+
+            return binary;
+        }
 	};
 }
 
