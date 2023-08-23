@@ -18,7 +18,9 @@
 #define TA_COMMONTOOLS_H
 
 #include <list>
+#include <map>
 #include <string_view>
+#include <vector>
 
 #include "TA_MarcoDefine.h"
 
@@ -106,6 +108,50 @@ namespace CoreAsync
             return binary;
         }
 	};
+
+    class MapUtils
+    {
+    public:
+        template <typename Key, typename T, typename Cmp = std::less<Key>, typename Allocator = std::allocator<std::pair<const Key, T>> ,template <typename K, typename V, typename C, typename A> class MapType = std::map>
+        static std::vector<T> values(MapType<Key, T, Cmp, Allocator> &map, Key k)
+        {
+            std::vector<T> vec;
+            auto &&[start, end] = map.equal_range(k);
+            for(auto iter = start; iter != end;++iter)
+            {
+                vec.emplace_back(iter->second);
+            }
+            return vec;
+        }
+
+        template <typename Key, typename T, typename Cmp = std::less<Key>, typename Allocator = std::allocator<std::pair<const Key, T>>, template <typename K, typename V, typename C, typename A> class MapType = std::map>
+        static void remove(MapType<Key, T, Cmp, Allocator> &map, const Key &k)
+        {
+            for(std::decay_t<decltype(map)> pIter = map.begin(); pIter != map.end();)
+            {
+                if(pIter->first == k)
+                {
+                    pIter = map.erase(pIter);
+                }
+                else
+                    ++pIter;
+            }
+        }
+
+        template <typename Key, typename T, typename Cmp = std::less<Key>, typename Allocator = std::allocator<std::pair<const Key, T>>, template <typename K, typename V, typename C, typename A> class MapType = std::map>
+        static void remove(MapType<Key, T, Cmp, Allocator> &map, Key &&k)
+        {
+            for(typename std::decay_t<decltype(map)>::iterator pIter = map.begin(); pIter != map.end();)
+            {
+                if(pIter->first == k)
+                {
+                    pIter = map.erase(pIter);
+                }
+                else
+                    ++pIter;
+            }
+        }
+    };
 }
 
 #endif
