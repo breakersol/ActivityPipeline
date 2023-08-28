@@ -40,3 +40,10 @@ TEST_F(TA_CommonToolsTest, mapUtilsRemoveTest)
     CoreAsync::MapUtils::remove(map, 1);
     EXPECT_EQ(map.contains(2) && map.contains(3), true);
 }
+
+TEST_F(TA_CommonToolsTest, mapUtilsKeyTest)
+{
+    std::multimap<int, std::string> map{{1,"1"},{2,"2"}, {3,"3"}, {1,"111"}};
+    auto res = CoreAsync::MapUtils::key(map, {"111"});
+    EXPECT_EQ(res == 1, true);
+}

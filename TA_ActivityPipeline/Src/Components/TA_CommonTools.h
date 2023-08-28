@@ -21,6 +21,7 @@
 #include <map>
 #include <string_view>
 #include <vector>
+#include <unordered_map>
 
 #include "TA_MarcoDefine.h"
 
@@ -113,7 +114,157 @@ namespace CoreAsync
     {
     public:
         template <typename Key, typename T, typename Cmp = std::less<Key>, typename Allocator = std::allocator<std::pair<const Key, T>> ,template <typename K, typename V, typename C, typename A> class MapType = std::map>
-        static std::vector<T> values(MapType<Key, T, Cmp, Allocator> &map, Key k)
+        static std::list<Key> keys(const MapType<Key, T, Cmp, Allocator> &map)
+        {
+            std::list<Key> list;
+            for(auto &&[k,v] : map)
+            {
+                list.emplace_back(k);
+            }
+            return list;
+        }
+
+        template <typename Key, typename T, typename Hasher = std::hash<Key>, typename Eq = std::equal_to<Key>, typename Allocator = std::allocator<std::pair<const Key, T>>, template <typename K, typename V, typename H, typename E, typename A> class MapType = std::unordered_map>
+        static std::list<Key> keys(const MapType<Key, T, Hasher, Eq, Allocator> &map)
+        {
+            std::list<Key> list;
+            for(auto &&[k,v] : map)
+            {
+                list.emplace_back(k);
+            }
+            return list;
+        }
+
+        template <typename Key, typename T, typename Cmp = std::less<Key>, typename Allocator = std::allocator<std::pair<const Key, T>> ,template <typename K, typename V, typename C, typename A> class MapType = std::map>
+        static std::list<Key> keys(const MapType<Key, T, Cmp, Allocator> &map, const T &val)
+        {
+            std::list<Key> list;
+            for(auto &&[k,v] : map)
+            {
+                if(val == v)
+                    list.emplace_back(k);
+            }
+            return list;
+        }
+
+        template <typename Key, typename T, typename Cmp = std::less<Key>, typename Allocator = std::allocator<std::pair<const Key, T>> ,template <typename K, typename V, typename C, typename A> class MapType = std::map>
+        static std::list<Key> keys(const MapType<Key, T, Cmp, Allocator> &map, T &&val)
+        {
+            std::list<Key> list;
+            for(auto &&[k,v] : map)
+            {
+                if(val == v)
+                    list.emplace_back(k);
+            }
+            return list;
+        }
+
+        template <typename Key, typename T, typename Hasher = std::hash<Key>, typename Eq = std::equal_to<Key>, typename Allocator = std::allocator<std::pair<const Key, T>>, template <typename K, typename V, typename H, typename E, typename A> class MapType = std::unordered_map>
+        static std::list<Key> keys(const MapType<Key, T, Hasher, Eq, Allocator> &map, const T &val)
+        {
+            std::list<Key> list;
+            for(auto &&[k,v] : map)
+            {
+                if(val == v)
+                    list.emplace_back(k);
+            }
+            return list;
+        }
+
+        template <typename Key, typename T, typename Hasher = std::hash<Key>, typename Eq = std::equal_to<Key>, typename Allocator = std::allocator<std::pair<const Key, T>>, template <typename K, typename V, typename H, typename E, typename A> class MapType = std::unordered_map>
+        static std::list<Key> keys(const MapType<Key, T, Hasher, Eq, Allocator> &map, T &&val)
+        {
+            std::list<Key> list;
+            for(auto &&[k,v] : map)
+            {
+                if(val == v)
+                    list.emplace_back(k);
+            }
+            return list;
+        }
+
+        template <typename Key, typename T, typename Cmp = std::less<Key>, typename Allocator = std::allocator<std::pair<const Key, T>> ,template <typename K, typename V, typename C, typename A> class MapType = std::map>
+        static T value(const MapType<Key, T, Cmp, Allocator> &map, const Key &k)
+        {
+            auto &&[start, end] = map.equal_range(k);
+            for(auto iter = start; iter != end;++iter)
+            {
+                return iter->second;
+            }
+            return T {};
+        }
+
+        template <typename Key, typename T, typename Cmp = std::less<Key>, typename Allocator = std::allocator<std::pair<const Key, T>> ,template <typename K, typename V, typename C, typename A> class MapType = std::map>
+        static T value(const MapType<Key, T, Cmp, Allocator> &map, Key &&k)
+        {
+            auto &&[start, end] = map.equal_range(k);
+            for(auto iter = start; iter != end;++iter)
+            {
+                return iter->second;
+            }
+            return T {};
+        }
+
+        template <typename Key, typename T, typename Hasher = std::hash<Key>, typename Eq = std::equal_to<Key>, typename Allocator = std::allocator<std::pair<const Key, T>>, template <typename K, typename V, typename H, typename E, typename A> class MapType = std::unordered_map>
+        static T value(const MapType<Key, T, Hasher, Eq, Allocator> &map, const Key &k)
+        {
+            auto &&[start, end] = map.equal_range(k);
+            for(auto iter = start; iter != end;++iter)
+            {
+                return iter->second;
+            }
+            return T {};
+        }
+
+        template <typename Key, typename T, typename Hasher = std::hash<Key>, typename Eq = std::equal_to<Key>, typename Allocator = std::allocator<std::pair<const Key, T>>, template <typename K, typename V, typename H, typename E, typename A> class MapType = std::unordered_map>
+        static T value(const MapType<Key, T, Hasher, Eq, Allocator> &map, Key &&k)
+        {
+            auto &&[start, end] = map.equal_range(k);
+            for(auto iter = start; iter != end;++iter)
+            {
+                return iter->second;
+            }
+            return T {};
+        }
+
+        template <typename Key, typename T, typename Cmp = std::less<Key>, typename Allocator = std::allocator<std::pair<const Key, T>> ,template <typename K, typename V, typename C, typename A> class MapType = std::map>
+        static std::vector<T> values(const MapType<Key, T, Cmp, Allocator> &map, const Key &k)
+        {
+            std::vector<T> vec;
+            auto &&[start, end] = map.equal_range(k);
+            for(auto iter = start; iter != end;++iter)
+            {
+                vec.emplace_back(iter->second);
+            }
+            return vec;
+        }
+
+        template <typename Key, typename T, typename Cmp = std::less<Key>, typename Allocator = std::allocator<std::pair<const Key, T>> ,template <typename K, typename V, typename C, typename A> class MapType = std::map>
+        static std::vector<T> values(const MapType<Key, T, Cmp, Allocator> &map, Key &&k)
+        {
+            std::vector<T> vec;
+            auto &&[start, end] = map.equal_range(k);
+            for(auto iter = start; iter != end;++iter)
+            {
+                vec.emplace_back(iter->second);
+            }
+            return vec;
+        }
+
+        template <typename Key, typename T, typename Hasher = std::hash<Key>, typename Eq = std::equal_to<Key>, typename Allocator = std::allocator<std::pair<const Key, T>>, template <typename K, typename V, typename H, typename E, typename A> class MapType = std::unordered_map>
+        static std::vector<T> values(const MapType<Key, T, Hasher, Eq, Allocator> &map, const Key &k)
+        {
+            std::vector<T> vec;
+            auto &&[start, end] = map.equal_range(k);
+            for(auto iter = start; iter != end;++iter)
+            {
+                vec.emplace_back(iter->second);
+            }
+            return vec;
+        }
+
+        template <typename Key, typename T, typename Hasher = std::hash<Key>, typename Eq = std::equal_to<Key>, typename Allocator = std::allocator<std::pair<const Key, T>>, template <typename K, typename V, typename H, typename E, typename A> class MapType = std::unordered_map>
+        static std::vector<T> values(const MapType<Key, T, Hasher, Eq, Allocator> &map, Key &&k)
         {
             std::vector<T> vec;
             auto &&[start, end] = map.equal_range(k);
@@ -127,7 +278,7 @@ namespace CoreAsync
         template <typename Key, typename T, typename Cmp = std::less<Key>, typename Allocator = std::allocator<std::pair<const Key, T>>, template <typename K, typename V, typename C, typename A> class MapType = std::map>
         static void remove(MapType<Key, T, Cmp, Allocator> &map, const Key &k)
         {
-            for(std::decay_t<decltype(map)> pIter = map.begin(); pIter != map.end();)
+            for(typename std::decay_t<decltype(map)>::iterator pIter = map.begin(); pIter != map.end();)
             {
                 if(pIter->first == k)
                 {
@@ -150,6 +301,147 @@ namespace CoreAsync
                 else
                     ++pIter;
             }
+        }
+
+        template <typename Key, typename T, typename Hasher = std::hash<Key>, typename Eq = std::equal_to<Key>, typename Allocator = std::allocator<std::pair<const Key, T>>, template <typename K, typename V, typename H, typename E, typename A> class MapType = std::unordered_map>
+        static void remove(const MapType<Key, T, Hasher, Eq, Allocator> &map, const Key &k)
+        {
+            for(typename std::decay_t<decltype(map)>::iterator pIter = map.begin(); pIter != map.end();)
+            {
+                if(pIter->first == k)
+                {
+                    pIter = map.erase(pIter);
+                }
+                else
+                    ++pIter;
+            }
+        }
+
+        template <typename Key, typename T, typename Hasher = std::hash<Key>, typename Eq = std::equal_to<Key>, typename Allocator = std::allocator<std::pair<const Key, T>>, template <typename K, typename V, typename H, typename E, typename A> class MapType = std::unordered_map>
+        static void remove(const MapType<Key, T, Hasher, Eq, Allocator> &map, Key &&k)
+        {
+            for(typename std::decay_t<decltype(map)>::iterator pIter = map.begin(); pIter != map.end();)
+            {
+                if(pIter->first == k)
+                {
+                    pIter = map.erase(pIter);
+                }
+                else
+                    ++pIter;
+            }
+        }
+
+        template <typename Key, typename T, typename Cmp = std::less<Key>, typename Allocator = std::allocator<std::pair<const Key, T>>, template <typename K, typename V, typename C, typename A> class MapType = std::map>
+        static std::pair<Key, T> first(const MapType<Key, T, Cmp, Allocator> &map)
+        {
+            return *map.begin();
+        }
+
+        template <typename Key, typename T, typename Hasher = std::hash<Key>, typename Eq = std::equal_to<Key>, typename Allocator = std::allocator<std::pair<const Key, T>>, template <typename K, typename V, typename H, typename E, typename A> class MapType = std::unordered_map>
+        static std::pair<Key, T> first(const MapType<Key, T, Hasher, Eq, Allocator> &map)
+        {
+            return *map.begin();
+        }
+
+        template <typename Key, typename T, typename Cmp = std::less<Key>, typename Allocator = std::allocator<std::pair<const Key, T>>, template <typename K, typename V, typename C, typename A> class MapType = std::map>
+        static std::pair<Key, T> last(const MapType<Key, T, Cmp, Allocator> &map)
+        {
+            return *(--map.end());
+        }
+
+        template <typename Key, typename T, typename Hasher = std::hash<Key>, typename Eq = std::equal_to<Key>, typename Allocator = std::allocator<std::pair<const Key, T>>, template <typename K, typename V, typename H, typename E, typename A> class MapType = std::unordered_map>
+        static std::pair<Key, T> last(const MapType<Key, T, Hasher, Eq, Allocator> &map)
+        {
+            return *(--map.end());
+        }
+
+        template <typename Key, typename T, typename Cmp = std::less<Key>, typename Allocator = std::allocator<std::pair<const Key, T>>, template <typename K, typename V, typename C, typename A> class MapType = std::map>
+        static Key key(const MapType<Key, T, Cmp, Allocator> &map, const T &val)
+        {
+            for(auto &&[k, v] : map)
+            {
+                if(v == val)
+                    return k;
+            }
+            return Key {};
+        }
+
+        template <typename Key, typename T, typename Cmp = std::less<Key>, typename Allocator = std::allocator<std::pair<const Key, T>>, template <typename K, typename V, typename C, typename A> class MapType = std::map>
+        static Key key(const MapType<Key, T, Cmp, Allocator> &map, T &&val)
+        {
+            for(auto &&[k, v] : map)
+            {
+                if(v == val)
+                    return k;
+            }
+            return Key {};
+        }
+
+        template <typename Key, typename T, typename Hasher = std::hash<Key>, typename Eq = std::equal_to<Key>, typename Allocator = std::allocator<std::pair<const Key, T>>, template <typename K, typename V, typename H, typename E, typename A> class MapType = std::unordered_map>
+        static Key key(const MapType<Key, T, Hasher, Eq, Allocator> &map, const T &val)
+        {
+            for(auto &&[k, v] : map)
+            {
+                if(v == val)
+                    return k;
+            }
+            return Key {};
+        }
+
+        template <typename Key, typename T, typename Hasher = std::hash<Key>, typename Eq = std::equal_to<Key>, typename Allocator = std::allocator<std::pair<const Key, T>>, template <typename K, typename V, typename H, typename E, typename A> class MapType = std::unordered_map>
+        static Key key(const MapType<Key, T, Hasher, Eq, Allocator> &map, T &&val)
+        {
+            for(auto &&[k, v] : map)
+            {
+                if(v == val)
+                    return k;
+            }
+            return Key {};
+        }
+
+        template <typename Key, typename T, typename Cmp = std::less<Key>, typename Allocator = std::allocator<std::pair<const Key, T>>, template <typename K, typename V, typename C, typename A> class MapType = std::map>
+        static bool contains(const MapType<Key, T, Cmp, Allocator> &map, const Key &key, const T &val)
+        {
+            for(auto &&[k, v] : map)
+            {
+                if(v == val && k == key)
+                    return true;
+            }
+            return false;
+        }
+
+        template <typename Key, typename T, typename Cmp = std::less<Key>, typename Allocator = std::allocator<std::pair<const Key, T>>, template <typename K, typename V, typename C, typename A> class MapType = std::map>
+        static bool contains(const MapType<Key, T, Cmp, Allocator> &map, Key &&key, T &&val)
+        {
+            for(auto &&[k, v] : map)
+            {
+                if(v == val && k == key)
+                    return true;
+            }
+            return false;
+        }
+
+
+        template <typename Key, typename T, typename Hasher = std::hash<Key>, typename Eq = std::equal_to<Key>, typename Allocator = std::allocator<std::pair<const Key, T>>, template <typename K, typename V, typename H, typename E, typename A> class MapType = std::unordered_map>
+        static bool contains(const MapType<Key, T, Hasher, Eq, Allocator> &map, const Key &key, const T &val)
+        {
+            for(auto &&[k, v] : map)
+            {
+                if(v == val && k == key)
+                    return true;
+            }
+            return false;
+        }
+
+        template <typename Key, typename T, typename Hasher = std::hash<Key>, typename Eq = std::equal_to<Key>, typename Allocator = std::allocator<std::pair<const Key, T>>, template <typename K, typename V, typename H, typename E, typename A> class MapType = std::unordered_map>
+        static bool contains(const MapType<Key, T, Hasher, Eq, Allocator> &map, Key &&key, T &&val)
+        {
+            for(auto &&[k, v] : map)
+            {
+                if(v == val && k == key)
+                    return true;
+            }
+            return false;
         }
     };
 }
