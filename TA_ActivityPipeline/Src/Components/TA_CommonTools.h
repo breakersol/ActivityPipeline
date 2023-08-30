@@ -22,6 +22,7 @@
 #include <string_view>
 #include <vector>
 #include <unordered_map>
+#include <ranges>
 
 #include "TA_MarcoDefine.h"
 
@@ -38,12 +39,38 @@ namespace CoreAsync
 				return T{};
 			}
             typename Container::const_iterator pIter = container.begin();
-            for (std::size_t i = 0; i < index; i++)
-			{
-				pIter++;
-			}
+            std::advance(pIter, index);
 			return *pIter;
 		}
+
+        template <typename T, typename Container = std::list<std::decay_t<T> > >
+        static auto insert(Container &container, std::size_t index, const T &val)
+        {
+            typename Container::const_iterator pIter = container.begin();
+            std::advance(pIter, index);
+            return container.insert(pIter, val);
+        }
+
+        template <typename T, typename Container = std::list<std::decay_t<T> > >
+        static auto insert(Container &container, std::size_t index, T &&val)
+        {
+            typename Container::const_iterator pIter = container.begin();
+            std::advance(pIter, index);
+            return container.insert(pIter, val);
+        }
+
+        template <typename T, typename Container = std::list<std::decay_t<T> > >
+        static bool replace(Container &container, std::size_t index, const T &elem)
+        {
+            if (index >= container.size())
+            {
+                return false;
+            }
+            typename Container::iterator pIter = container.begin();
+            std::advance(pIter, index);
+            *pIter = elem;
+            return true;
+        }
 
 		template <typename T, typename Container = std::list<std::decay_t<T> > >
 		static bool replace(Container &container, std::size_t index, T &&elem)
@@ -53,10 +80,7 @@ namespace CoreAsync
 				return false;
 			}
             typename Container::iterator pIter = container.begin();
-            for (std::size_t i = 0; i < index; i++)
-			{
-				pIter++;
-			}
+            std::advance(pIter, index);
 			*pIter = elem;
 			return true;
 		}
@@ -69,10 +93,7 @@ namespace CoreAsync
 				return false;
 			}
             typename Container::iterator pIter{ container.begin() };
-            for (std::size_t i = 0; i < index; ++i)
-			{
-				pIter++;
-			}
+            std::advance(pIter, index);
             if constexpr (std::is_pointer_v<decltype(*pIter)>)
 			{
 				if (*pIter)
