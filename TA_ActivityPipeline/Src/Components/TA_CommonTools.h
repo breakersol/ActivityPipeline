@@ -106,6 +106,18 @@ namespace CoreAsync
 			return true;
 		}
 
+        template <typename T, typename Container = std::list<std::decay_t<T>>>
+        static bool contains(Container &container, const T &t)
+        {
+            return std::find(container.begin(), container.end(), t) != container.end();
+        }
+
+        template <typename T, typename Container = std::list<std::decay_t<T>>>
+        static bool contains(Container &container, T &&t)
+        {
+            return std::find(container.begin(), container.end(), t) != container.end();
+        }
+
         template <typename Text, typename ...Paras>
         static void debugInfo(Text text, Paras &&...paras)
         {
