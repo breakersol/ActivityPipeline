@@ -107,13 +107,41 @@ namespace CoreAsync
 		}
 
         template <typename T, typename Container = std::list<std::decay_t<T>>>
-        static bool contains(Container &container, const T &t)
+        static bool removeOne(Container &container, const T &t)
+        {
+            for(auto iter = container.begin();iter != container.end();++iter)
+            {
+                if(*iter == t)
+                {
+                    container.erase(iter);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        template <typename T, typename Container = std::list<std::decay_t<T>>>
+        static bool removeOne(Container &container, T &&t)
+        {
+            for(auto iter = container.begin();iter != container.end();++iter)
+            {
+                if(*iter == t)
+                {
+                    container.erase(iter);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        template <typename T, typename Container = std::list<std::decay_t<T>>>
+        static bool contains(const Container &container, const T &t)
         {
             return std::find(container.begin(), container.end(), t) != container.end();
         }
 
         template <typename T, typename Container = std::list<std::decay_t<T>>>
-        static bool contains(Container &container, T &&t)
+        static bool contains(const Container &container, T &&t)
         {
             return std::find(container.begin(), container.end(), t) != container.end();
         }
