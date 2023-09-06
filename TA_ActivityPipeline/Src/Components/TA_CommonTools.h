@@ -32,16 +32,20 @@ namespace CoreAsync
 	{
 	public:
         template <typename T, typename Container = std::list<std::decay_t<T> > >
-		static auto at(const Container &container, std::size_t index)
+        static auto at(const Container &container, std::size_t index) -> std::decay_t<T>
 		{
-			if (index >= container.size())
-			{
-				return T{};
-			}
             typename Container::const_iterator pIter = container.begin();
             std::advance(pIter, index);
 			return *pIter;
 		}
+
+        template <typename T, typename Container = std::list<std::decay_t<T> > >
+        static auto ref(Container &container, std::size_t index) -> std::decay_t<T> &
+        {
+            typename Container::iterator pIter = container.begin();
+            std::advance(pIter, index);
+            return *pIter;
+        }
 
         template <typename T, typename Container = std::list<std::decay_t<T> > >
         static auto insert(Container &container, std::size_t index, const T &val)
@@ -144,6 +148,20 @@ namespace CoreAsync
         static bool contains(const Container &container, T &&t)
         {
             return std::find(container.begin(), container.end(), t) != container.end();
+        }
+
+        template <typename T, typename Container = std::list<std::decay_t<T>>>
+        static int indexOf(const Container &container, const T &t)
+        {
+            int index {0};
+            for (auto it = container.begin(); it != container.end(); ++it, ++index)
+            {
+                if (*it == t)
+                {
+                    return index;
+                }
+            }
+            return -1;
         }
 
         template <typename Text, typename ...Paras>
@@ -289,9 +307,9 @@ namespace CoreAsync
         }
 
         template <typename Key, typename T, typename Cmp = std::less<Key>, typename Allocator = std::allocator<std::pair<const Key, T>> ,template <typename K, typename V, typename C, typename A> class MapType = std::map>
-        static std::vector<T> values(const MapType<Key, T, Cmp, Allocator> &map, const Key &k)
+        static std::list<T> values(const MapType<Key, T, Cmp, Allocator> &map, const Key &k)
         {
-            std::vector<T> vec;
+            std::list<T> vec;
             auto &&[start, end] = map.equal_range(k);
             for(auto iter = start; iter != end;++iter)
             {
@@ -301,9 +319,9 @@ namespace CoreAsync
         }
 
         template <typename Key, typename T, typename Cmp = std::less<Key>, typename Allocator = std::allocator<std::pair<const Key, T>> ,template <typename K, typename V, typename C, typename A> class MapType = std::map>
-        static std::vector<T> values(const MapType<Key, T, Cmp, Allocator> &map, Key &&k)
+        static std::list<T> values(const MapType<Key, T, Cmp, Allocator> &map, Key &&k)
         {
-            std::vector<T> vec;
+            std::list<T> vec;
             auto &&[start, end] = map.equal_range(k);
             for(auto iter = start; iter != end;++iter)
             {
@@ -313,9 +331,9 @@ namespace CoreAsync
         }
 
         template <typename Key, typename T, typename Hasher = std::hash<Key>, typename Eq = std::equal_to<Key>, typename Allocator = std::allocator<std::pair<const Key, T>>, template <typename K, typename V, typename H, typename E, typename A> class MapType = std::unordered_map>
-        static std::vector<T> values(const MapType<Key, T, Hasher, Eq, Allocator> &map, const Key &k)
+        static std::list<T> values(const MapType<Key, T, Hasher, Eq, Allocator> &map, const Key &k)
         {
-            std::vector<T> vec;
+            std::list<T> vec;
             auto &&[start, end] = map.equal_range(k);
             for(auto iter = start; iter != end;++iter)
             {
@@ -325,13 +343,35 @@ namespace CoreAsync
         }
 
         template <typename Key, typename T, typename Hasher = std::hash<Key>, typename Eq = std::equal_to<Key>, typename Allocator = std::allocator<std::pair<const Key, T>>, template <typename K, typename V, typename H, typename E, typename A> class MapType = std::unordered_map>
-        static std::vector<T> values(const MapType<Key, T, Hasher, Eq, Allocator> &map, Key &&k)
+        static std::list<T> values(const MapType<Key, T, Hasher, Eq, Allocator> &map, Key &&k)
         {
-            std::vector<T> vec;
+            std::list<T> vec;
             auto &&[start, end] = map.equal_range(k);
             for(auto iter = start; iter != end;++iter)
             {
                 vec.emplace_back(iter->second);
+            }
+            return vec;
+        }
+
+        template <typename Key, typename T, typename Cmp = std::less<Key>, typename Allocator = std::allocator<std::pair<const Key, T>> ,template <typename K, typename V, typename C, typename A> class MapType = std::map>
+        static std::list<T> values(const MapType<Key, T, Cmp, Allocator> &map)
+        {
+            std::list<T> vec;
+            for(auto &[k, v] : map)
+            {
+                vec.emplace_back(v);
+            }
+            return vec;
+        }
+
+        template <typename Key, typename T, typename Hasher = std::hash<Key>, typename Eq = std::equal_to<Key>, typename Allocator = std::allocator<std::pair<const Key, T>>, template <typename K, typename V, typename H, typename E, typename A> class MapType = std::unordered_map>
+        static std::list<T> values(const MapType<Key, T, Hasher, Eq, Allocator> &map)
+        {
+            std::list<T> vec;
+            for(auto &[k, v] : map)
+            {
+                vec.emplace_back(v);
             }
             return vec;
         }
