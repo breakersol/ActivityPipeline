@@ -27,6 +27,21 @@ TEST_F(TA_CommonToolsTest, decToBinTest)
     EXPECT_EQ(res, "111100110010010001001");
 }
 
+TEST_F(TA_CommonToolsTest, midTest)
+{
+    std::list<int> l {1,2,3,4,5,6,7,8};
+    auto res = CoreAsync::TA_CommonTools::mid<int>(l, 2, 4);
+    EXPECT_EQ(res.front(), 3);
+    EXPECT_EQ(res.back(), 5);
+}
+
+TEST_F(TA_CommonToolsTest, takeAtTest)
+{
+    std::list<int> l {1,2,3,4,5,6,7,8};
+    auto res = CoreAsync::TA_CommonTools::takeAt<int>(l, 2);
+    EXPECT_EQ(res, 3);
+}
+
 TEST_F(TA_CommonToolsTest, mapUtilsValueTest)
 {
     std::multimap<int, std::string> map{{1,"1"},{2,"2"}, {3,"3"}, {1,"111"}};

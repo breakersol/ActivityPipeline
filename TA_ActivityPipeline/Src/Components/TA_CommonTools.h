@@ -110,6 +110,28 @@ namespace CoreAsync
 			return true;
 		}
 
+        template <typename T, typename Container = std::list<std::decay_t<T> > >
+        static T takeAt(Container &container, std::size_t index)
+        {
+            if (index >= container.size())
+            {
+                return T {};
+            }
+            typename Container::iterator pIter{ container.begin() };
+            std::advance(pIter, index);
+            T res {*pIter};
+            if constexpr (std::is_pointer_v<decltype(*pIter)>)
+            {
+                if (*pIter)
+                {
+                    delete* pIter;
+                    *pIter = nullptr;
+                }
+            }
+            container.erase(pIter);
+            return res;
+        }
+
         template <typename T, typename Container = std::list<std::decay_t<T>>>
         static bool removeOne(Container &container, const T &t)
         {
@@ -162,6 +184,18 @@ namespace CoreAsync
                 }
             }
             return -1;
+        }
+
+        template <typename T, typename Container = std::list<std::decay_t<T>>>
+        static Container mid(const Container &container, std::size_t startIndex, std::size_t length)
+        {
+            auto start {container.begin()};
+            auto end {container.begin()};
+            std::advance(start, startIndex);
+            std::advance(end, startIndex + length - 1);
+            Container res;
+            res.assign(start, end);
+            return res;
         }
 
         template <typename Text, typename ...Paras>
