@@ -439,7 +439,7 @@ namespace CoreAsync
         }
 
         template <typename Key, typename T, typename Hasher = std::hash<Key>, typename Eq = std::equal_to<Key>, typename Allocator = std::allocator<std::pair<const Key, T>>, template <typename K, typename V, typename H, typename E, typename A> class MapType = std::unordered_map>
-        static void remove(const MapType<Key, T, Hasher, Eq, Allocator> &map, const Key &k)
+        static void remove(MapType<Key, T, Hasher, Eq, Allocator> &map, const Key &k)
         {
             for(typename std::decay_t<decltype(map)>::iterator pIter = map.begin(); pIter != map.end();)
             {
@@ -453,7 +453,7 @@ namespace CoreAsync
         }
 
         template <typename Key, typename T, typename Hasher = std::hash<Key>, typename Eq = std::equal_to<Key>, typename Allocator = std::allocator<std::pair<const Key, T>>, template <typename K, typename V, typename H, typename E, typename A> class MapType = std::unordered_map>
-        static void remove(const MapType<Key, T, Hasher, Eq, Allocator> &map, Key &&k)
+        static void remove(MapType<Key, T, Hasher, Eq, Allocator> &map, Key &&k)
         {
             for(typename std::decay_t<decltype(map)>::iterator pIter = map.begin(); pIter != map.end();)
             {
