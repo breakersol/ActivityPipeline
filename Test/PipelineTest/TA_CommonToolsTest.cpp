@@ -62,3 +62,11 @@ TEST_F(TA_CommonToolsTest, mapUtilsKeyTest)
     auto res = CoreAsync::MapUtils::key(map, {"111"});
     EXPECT_EQ(res == 1, true);
 }
+
+TEST_F(TA_CommonToolsTest, splitTest)
+{
+    std::string source {"123,345,456"};
+    auto res = CoreAsync::StringUtils::split(source, ',');
+    EXPECT_EQ(res.front(), "123");
+    EXPECT_EQ(res.back(), "456");
+}
