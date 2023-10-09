@@ -70,3 +70,11 @@ TEST_F(TA_CommonToolsTest, splitTest)
     EXPECT_EQ(res.front(), "123");
     EXPECT_EQ(res.back(), "456");
 }
+
+TEST_F(TA_CommonToolsTest, mapLastTest)
+{
+    std::unordered_map<int,int> map {{1,1},{2,2},{3,3}};
+    auto [k ,v] = CoreAsync::MapUtils::last(map);
+    EXPECT_EQ(k, 3);
+    EXPECT_EQ(v, 3);
+}
