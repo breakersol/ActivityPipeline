@@ -483,17 +483,17 @@ namespace CoreAsync
         template <typename Key, typename T, typename Cmp = std::less<Key>, typename Allocator = std::allocator<std::pair<const Key, T>>, template <typename K, typename V, typename C, typename A> class MapType = std::map>
         static std::pair<Key, T> last(const MapType<Key, T, Cmp, Allocator> &map)
         {
-            auto iter {map.end()};
-            std::advance(iter, -1);
+            auto iter {map.begin()};
+            std::advance(iter, map.size() - 1);
             return *iter;
         }
 
         template <typename Key, typename T, typename Hasher = std::hash<Key>, typename Eq = std::equal_to<Key>, typename Allocator = std::allocator<std::pair<const Key, T>>, template <typename K, typename V, typename H, typename E, typename A> class MapType = std::unordered_map>
         static std::pair<Key, T> last(const MapType<Key, T, Hasher, Eq, Allocator> &map)
         {
-            auto iter {map.end()};
-            std::advance(iter, -1);
-            return *iter;
+            auto iter {map.begin()};
+            std::advance(iter, map.size() - 1);
+            return *iter;   
         }
 
         template <typename Key, typename T, typename Cmp = std::less<Key>, typename Allocator = std::allocator<std::pair<const Key, T>>, template <typename K, typename V, typename C, typename A> class MapType = std::map>
