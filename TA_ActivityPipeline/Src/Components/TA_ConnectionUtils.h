@@ -19,6 +19,7 @@
 
 #include <type_traits>
 #include <unordered_map>
+#include <unordered_set>
 #include <tuple>
 #include <memory>
 
@@ -83,19 +84,19 @@ namespace CoreAsync
     public:
         using ReceiversList = std::list<std::tuple<TA_BaseReceiverObject *, void *, std::string_view, TA_ConnectionType> >;
 
-        bool insert(std::string_view &&object, TA_ConnectionUnit &&unit);
-        bool remove(std::string_view &&object, TA_ConnectionUnit &&unit);
-        void clear();
+        bool registConnection(std::string_view &&object, TA_ConnectionUnit &&unit);
+        bool removeConnection(std::string_view &&object, TA_ConnectionUnit &&unit);
+        void removeConnection(void *pReceiver);
 
         std::size_t size() const;
 
         template <EnableConnectObjectType Sender, typename SenderFunc>
-        ReceiversList findReceivers(Sender *&pSender, SenderFunc &&sFunc)
+        ReceiversList findReceiverWrappers(Sender *&pSender, SenderFunc &&sFunc)
         {
             ReceiversList list {};
 
             using ParentType = typename FunctionTypeInfo<SenderFunc>::ParentClass;
-            if(!std::is_convertible_v<std::decay_t<Sender> *, ParentType *>)
+            if constexpr(!std::is_convertible_v<std::decay_t<Sender> *, ParentType *>)
                 return list;
             if constexpr(!Reflex::TA_MemberTypeTrait<SenderFunc>::noneStaticMemberFuncFlag || !IsReturnTypeEqual<void, std::decay_t<SenderFunc>, std::is_same>::value)
             {
@@ -118,31 +119,29 @@ namespace CoreAsync
                 }
                 start++;
             }
-            if(end != m_connections.end())
-            {
-                auto &&endUnit {end->second};
-                if(endUnit.m_pSender == pSender && endUnit.m_senderFunc == senderFuncName)
-                {
-                    list.emplace_back(std::tuple {endUnit.m_pReceiverObject.get(), endUnit.m_pReceiver, endUnit.m_receiverFunc, endUnit.m_type});
-                }
-            }
             return list;
         }
 
         TA_ConnectionsRegister();
         ~TA_ConnectionsRegister();
 
+        TA_ConnectionsRegister(const TA_ConnectionsRegister &reg) = delete;
+        TA_ConnectionsRegister(TA_ConnectionsRegister &&reg) = delete;
+
+    private:
+        void clear();
+
     private:
         std::unordered_multimap<std::string_view, TA_ConnectionUnit> m_connections;
 
     };
 
-    class ASYNC_PIPELINE_EXPORT TA_ConnectionResponder
+    class TA_ConnectionResponder
     {
     public:
-        static TA_ConnectionResponder & GetIns();
+        ASYNC_PIPELINE_EXPORT static TA_ConnectionResponder & GetIns();
 
-        bool response(TA_BasicActivity *&pActivity, TA_ConnectionType type);
+        ASYNC_PIPELINE_EXPORT bool response(TA_BasicActivity *&pActivity, TA_ConnectionType type);
 
     private:
         TA_ConnectionResponder();
@@ -153,6 +152,27 @@ namespace CoreAsync
     private:
         ActivityQueue m_queue {};
         static std::atomic<bool> m_enableConsume;
+
+    };
+
+    class TA_ConnectionsRecorder
+    {
+    public:
+        TA_ConnectionsRecorder(void *pReceiver);
+        ~TA_ConnectionsRecorder();
+
+        TA_ConnectionsRecorder(const TA_ConnectionsRecorder &recorder) = delete;
+        TA_ConnectionsRecorder(TA_ConnectionsRecorder &&recorder) = delete;
+
+        bool record(void *pObject);
+        bool remove(void *pObject);
+
+    private:
+        void clear();
+
+    private:
+        std::unordered_set<void *> m_recordSet;
+        void *m_pReceiver;
 
     };
 
