@@ -11,6 +11,12 @@ set(CMAKE_BUILD_TYPE_RELEASE "Release")
 include_directories(../TA_ActivityPipeline/Src)
 include_directories(./ThirdParty/googletest/googletest/include)
 
+enable_language(CUDA)
+set(CMAKE_CUDA_STANDARD 20)
+set(CMAKE_CUDA_STANDARD_REQUIRED ON)
+
+include_directories(${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
+
 add_executable(PipelineTest PipelineTest/main.cpp
     PipelineTest/TA_ActivityTest.cpp
     PipelineTest/TA_ActivityTest.h
@@ -88,6 +94,15 @@ elseif(UNIX)
     target_link_directories(PipelineTest PRIVATE ThirdParty/googletest/output)
     target_link_directories(PipelineTest PRIVATE ../build/TA_ActivityPipeline/output)
 endif()
+
+find_package(CUDAToolkit)
+set_target_properties(AsyncPipeline PROPERTIES CUDA_ARCHITECTURES 61)
+
+set_target_properties(
+    AsyncPipeline
+    PROPERTIES
+    CUDA_SEPARABLE_COMPILATION ON
+)
 
 install(TARGETS PipelineTest
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.20)
 
 project(AsyncPipeline LANGUAGES CXX)
 
@@ -16,6 +16,12 @@ if(MSVC)
 endif()
 
 include_directories(${PROJECT_SOURCE_DIR}/Src)
+
+enable_language(CUDA)
+set(CMAKE_CUDA_STANDARD 20)
+set(CMAKE_CUDA_STANDARD_REQUIRED ON)
+
+include_directories(${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
 
 add_library(AsyncPipeline SHARED
     Src/TA_ActivityPipeline_global.h
@@ -58,6 +64,16 @@ add_library(AsyncPipeline SHARED
     Src/Components/TA_ThreadPool.h
     Src/Components/TA_MarcoDefine.h
     Src/Components/TA_CommonTools.cpp
+    Src/Cu/TestCuda.cu
+)
+
+find_package(CUDAToolkit)
+set_target_properties(AsyncPipeline PROPERTIES CUDA_ARCHITECTURES 61)
+
+set_target_properties(
+    AsyncPipeline
+    PROPERTIES
+    CUDA_SEPARABLE_COMPILATION ON
 )
 
 target_compile_definitions(AsyncPipeline PRIVATE ASYNCPIPELINE_LIBRARY)
