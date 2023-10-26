@@ -1,14 +1,17 @@
 #include <cuda_runtime.h>
+#include <device_launch_parameters.h>
 
 // Matrices are stored in row-major order:
 // M(row, col) = *(M.elements + row * M.stride + col)
-typedef struct {
+extern "C" struct Matrix
+{
     int width;
     int height;
     int stride;
-    float* elements;
-} Matrix;
+    float *elements;
+};
 
+// Thread block size
 #define BLOCK_SIZE 16
 
 // Get a matrix element
@@ -35,13 +38,12 @@ __device__ Matrix GetSubMatrix(Matrix A, int row, int col)
                                 + BLOCK_SIZE * col];
     return Asub;
 }
-// Thread block size
-#define BLOCK_SIZE 16
+
 // Forward declaration of the matrix multiplication kernel
 __global__ void MatMulKernel(const Matrix, const Matrix, Matrix);
 // Matrix multiplication - Host code
 // Matrix dimensions are assumed to be multiples of BLOCK_SIZE
-void MatMul(const Matrix A, const Matrix B, Matrix C)
+extern "C" void MatMul(const Matrix A, const Matrix B, Matrix C)
 {
     // Load A and B to device memory
     Matrix d_A;

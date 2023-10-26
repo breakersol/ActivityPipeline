@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(AsyncPipeline LANGUAGES CXX)
+project(AsyncPipeline LANGUAGES CXX CUDA)
 
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fms-extensions")
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -63,12 +63,13 @@ add_library(AsyncPipeline SHARED
     Src/Components/TA_MetaStringView.h
     Src/Components/TA_ThreadPool.h
     Src/Components/TA_MarcoDefine.h
-    Src/Components/TA_CommonTools.cpp
+    Src/Components/TA_CommonTools.cpp  
     Src/Cu/TestCuda.cu
 )
 
 find_package(CUDAToolkit)
 set_target_properties(AsyncPipeline PROPERTIES CUDA_ARCHITECTURES 61)
+set_target_properties(AsyncPipeline PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 
 set_target_properties(
     AsyncPipeline
