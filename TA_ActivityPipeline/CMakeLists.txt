@@ -65,10 +65,11 @@ add_library(AsyncPipeline SHARED
     Src/Components/TA_MarcoDefine.h
     Src/Components/TA_CommonTools.cpp  
     Src/Cu/TestCuda.cu
+    Src/Cu/TestCuda.h
 )
 
 find_package(CUDAToolkit)
-set_target_properties(AsyncPipeline PROPERTIES CUDA_ARCHITECTURES 61)
+set_target_properties(AsyncPipeline PROPERTIES CUDA_ARCHITECTURES 52)
 set_target_properties(AsyncPipeline PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 
 set_target_properties(
