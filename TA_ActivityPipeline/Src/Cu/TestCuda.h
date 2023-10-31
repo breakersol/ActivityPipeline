@@ -1,6 +1,8 @@
 #ifndef TESTCUDA_H
 #define TESTCUDA_H
 
+#include <cstddef>
+
 #include "TA_ActivityPipeline_global.h"
 
 // Thread block size
@@ -10,9 +12,9 @@
 // M(row, col) = *(M.elements + row * M.stride + col)
 struct Matrix
 {
-    int width;
-    int height;
-    int stride;
+    std::size_t width;
+    std::size_t height;
+    std::size_t stride;
     float *elements = nullptr;
 };
 

@@ -38,9 +38,11 @@ void MatMul(const Matrix A, const Matrix B, Matrix C)
     Matrix d_A;
     d_A.width = d_A.stride = A.width; d_A.height = A.height;
     size_t size = A.width * A.height * sizeof(float);
-    cudaMalloc(&d_A.elements, size);
-    cudaMemcpy(d_A.elements, A.elements, size,
-               cudaMemcpyHostToDevice);
+//    cudaMalloc(&d_A.elements, size);
+//    cudaMemcpy(d_A.elements, A.elements, size,
+//               cudaMemcpyHostToDevice);
+    cudaMallocPitch(&d_A.elements, &d_A.stride, d_A.width * sizeof(float), d_A.height);
+    cudaMemcpy2D(d_A.elements, d_A.stride, A.elements, A.stride, A.width * sizeof(float), A.height, cudaMemcpyHostToDevice);
     Matrix d_B;
     d_B.width = d_B.stride = B.width; d_B.height = B.height;
     size = B.width * B.height * sizeof(float);
