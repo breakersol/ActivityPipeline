@@ -42,25 +42,34 @@ void MatMul(const Matrix A, const Matrix B, Matrix C)
 //    cudaMemcpy(d_A.elements, A.elements, size,
 //               cudaMemcpyHostToDevice);
     cudaMallocPitch(&d_A.elements, &d_A.stride, d_A.width * sizeof(float), d_A.height);
-    cudaMemcpy2D(d_A.elements, d_A.stride, A.elements, A.stride, A.width * sizeof(float), A.height, cudaMemcpyHostToDevice);
+    cudaMemcpy2D(d_A.elements, d_A.stride, A.elements, A.stride * sizeof(float), A.width * sizeof(float), A.height, cudaMemcpyHostToDevice);
     Matrix d_B;
     d_B.width = d_B.stride = B.width; d_B.height = B.height;
     size = B.width * B.height * sizeof(float);
-    cudaMalloc(&d_B.elements, size);
-    cudaMemcpy(d_B.elements, B.elements, size,
-               cudaMemcpyHostToDevice);
+//    cudaMalloc(&d_B.elements, size);
+//    cudaMemcpy(d_B.elements, B.elements, size,
+//               cudaMemcpyHostToDevice);
+    cudaMallocPitch(&d_B.elements, &d_B.stride, d_B.width * sizeof(float), d_B.height);
+    cudaMemcpy2D(d_B.elements, d_B.stride, B.elements, B.stride * sizeof(float), B.width * sizeof(float), B.height, cudaMemcpyHostToDevice);
+
     // Allocate C in device memory
     Matrix d_C;
     d_C.width = d_C.stride = C.width; d_C.height = C.height;
     size = C.width * C.height * sizeof(float);
-    cudaMalloc(&d_C.elements, size);
+//    cudaMalloc(&d_C.elements, size);
+    auto r1 = cudaMallocPitch(&d_C.elements, &d_C.stride, d_C.width * sizeof(float), d_C.height);
     // Invoke kernel
     dim3 dimBlock(BLOCK_SIZE, BLOCK_SIZE);
     dim3 dimGrid(B.width / dimBlock.x, A.height / dimBlock.y);
     MatMulKernel<<<dimGrid, dimBlock>>>(d_A, d_B, d_C);
     // Read C from device memory
-    cudaMemcpy(C.elements, d_C.elements, size,
-               cudaMemcpyDeviceToHost);
+//    cudaMemcpy(C.elements, d_C.elements, size,
+//               cudaMemcpyDeviceToHost);
+    auto r2 = cudaMemcpy2D(C.elements, C.stride * sizeof(float), d_C.elements, d_C.stride, d_C.width * sizeof(float), d_C.height, cudaMemcpyDeviceToHost);
+
+    float val;
+    cudaMemcpy(&val, d_C.elements, sizeof(float), cudaMemcpyDeviceToHost);
+
     // Free device memory
     cudaFree(d_A.elements);
     cudaFree(d_B.elements);
