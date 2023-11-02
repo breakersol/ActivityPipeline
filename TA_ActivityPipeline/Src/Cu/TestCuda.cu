@@ -6,13 +6,13 @@
 // Get a matrix element
 __device__ float GetElement(const Matrix A, int row, int col)
 {
-    return A.elements[row * A.stride + col];
+    return *(A.elements + row * A.stride / sizeof(float) + col);
 }
 // Set a matrix element
 __device__ void SetElement(Matrix A, int row, int col,
                            float value)
 {
-    A.elements[row * A.stride + col] = value;
+    *(A.elements + row * A.stride / sizeof(float) + col) = value;
 }
 // Get the BLOCK_SIZExBLOCK_SIZE sub-matrix Asub of A that is
 // located col sub-matrices to the right and row sub-matrices down
@@ -23,8 +23,8 @@ __device__ Matrix GetSubMatrix(Matrix A, int row, int col)
     Asub.width    = BLOCK_SIZE;
     Asub.height   = BLOCK_SIZE;
     Asub.stride   = A.stride;
-    Asub.elements = &A.elements[A.stride * BLOCK_SIZE * row
-                                + BLOCK_SIZE * col];
+    Asub.elements = A.elements + A.stride * BLOCK_SIZE * row
+                      + BLOCK_SIZE * col;
     return Asub;
 }
 
@@ -43,6 +43,7 @@ void MatMul(const Matrix A, const Matrix B, Matrix C)
 //               cudaMemcpyHostToDevice);
     cudaMallocPitch(&d_A.elements, &d_A.stride, d_A.width * sizeof(float), d_A.height);
     cudaMemcpy2D(d_A.elements, d_A.stride, A.elements, A.stride * sizeof(float), A.width * sizeof(float), A.height, cudaMemcpyHostToDevice);
+
     Matrix d_B;
     d_B.width = d_B.stride = B.width; d_B.height = B.height;
     size = B.width * B.height * sizeof(float);
@@ -57,7 +58,7 @@ void MatMul(const Matrix A, const Matrix B, Matrix C)
     d_C.width = d_C.stride = C.width; d_C.height = C.height;
     size = C.width * C.height * sizeof(float);
 //    cudaMalloc(&d_C.elements, size);
-    auto r1 = cudaMallocPitch(&d_C.elements, &d_C.stride, d_C.width * sizeof(float), d_C.height);
+    cudaMallocPitch(&d_C.elements, &d_C.stride, d_C.width * sizeof(float), d_C.height);
     // Invoke kernel
     dim3 dimBlock(BLOCK_SIZE, BLOCK_SIZE);
     dim3 dimGrid(B.width / dimBlock.x, A.height / dimBlock.y);
@@ -65,10 +66,7 @@ void MatMul(const Matrix A, const Matrix B, Matrix C)
     // Read C from device memory
 //    cudaMemcpy(C.elements, d_C.elements, size,
 //               cudaMemcpyDeviceToHost);
-    auto r2 = cudaMemcpy2D(C.elements, C.stride * sizeof(float), d_C.elements, d_C.stride, d_C.width * sizeof(float), d_C.height, cudaMemcpyDeviceToHost);
-
-    float val;
-    cudaMemcpy(&val, d_C.elements, sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy2D(C.elements, C.stride * sizeof(float), d_C.elements, d_C.stride, d_C.width * sizeof(float), d_C.height, cudaMemcpyDeviceToHost);
 
     // Free device memory
     cudaFree(d_A.elements);
