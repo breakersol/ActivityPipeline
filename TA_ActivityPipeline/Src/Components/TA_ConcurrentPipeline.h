@@ -14,23 +14,28 @@
  * limitations under the License.
  */
 
-#ifndef TA_PARALLELPIPELINE_H
-#define TA_PARALLELPIPELINE_H
+#ifndef TA_CONCURRENTPIPELINE_H
+#define TA_CONCURRENTPIPELINE_H
 
 #include "TA_BasicPipeline.h"
 
+#include <semaphore>
+
 namespace CoreAsync {
-    class ASYNC_PIPELINE_EXPORT TA_ParallelPipeline : public TA_BasicPipeline
+    class ASYNC_PIPELINE_EXPORT TA_ConcurrentPipeline : public TA_BasicPipeline
     {
     public:
-        TA_ParallelPipeline();
-        virtual ~TA_ParallelPipeline() {}
+        TA_ConcurrentPipeline();
+        virtual ~TA_ConcurrentPipeline() {}
 
-        TA_ParallelPipeline(const TA_ParallelPipeline &activity) = delete;
-        TA_ParallelPipeline(TA_ParallelPipeline &&activity) = delete;
-        TA_ParallelPipeline & operator = (const TA_ParallelPipeline &) = delete;
+        TA_ConcurrentPipeline(const TA_ConcurrentPipeline &activity) = delete;
+        TA_ConcurrentPipeline(TA_ConcurrentPipeline &&activity) = delete;
+        TA_ConcurrentPipeline & operator = (const TA_ConcurrentPipeline &) = delete;
 
         void taskCompleted(std::size_t id, TA_Variant var);
+
+        void clear() override final;
+        void reset() override final;
 
     protected:
         void run() override final;
@@ -38,13 +43,14 @@ namespace CoreAsync {
     private:
         std::vector<std::size_t> m_activityIds;
         std::size_t m_waitingCount;
+        std::binary_semaphore m_postSemaphore {0};
 
     };
 
     namespace Reflex
     {
         template <>
-        struct ASYNC_PIPELINE_EXPORT TA_TypeInfo<TA_ParallelPipeline> : TA_MetaTypeInfo<TA_ParallelPipeline,TA_BasicPipeline>
+        struct ASYNC_PIPELINE_EXPORT TA_TypeInfo<TA_ConcurrentPipeline> : TA_MetaTypeInfo<TA_ConcurrentPipeline,TA_BasicPipeline>
         {
             static constexpr TA_MetaFieldList fields = {
                 TA_MetaField {&Raw::taskCompleted, META_STRING("taskCompleted")},
@@ -53,4 +59,4 @@ namespace CoreAsync {
     }
 }
 
-#endif // TA_PARALLELPIPELINE_H
+#endif // TA_CONCURRENTPIPELINE_H

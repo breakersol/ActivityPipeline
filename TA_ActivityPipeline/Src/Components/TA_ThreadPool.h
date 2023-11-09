@@ -81,14 +81,15 @@ namespace CoreAsync {
                 }
                 return var;
             }, std::move(pr));
-            std::size_t idx = wrapperActivity->id() % m_threads.size();
+            auto activityId {wrapperActivity->id()};
+            std::size_t idx = activityId % m_threads.size();
             if(!m_activityQueues[idx].push(wrapperActivity))
                 return std::make_pair(std::future<TA_Variant> {}, std::size_t {});
             if(!m_states[idx].m_isBusy.load(std::memory_order_acquire))
             {
                 m_states[idx].resource.release();
             }
-            return std::make_pair(std::move(ft), wrapperActivity->id());
+            return std::make_pair(std::move(ft), activityId);
         }
 
         std::size_t size() const
@@ -117,7 +118,7 @@ namespace CoreAsync {
                                     pActivity = nullptr;
                                 }
                             }
-                            if(trySteal(pActivity) && pActivity)
+                            if(trySteal(pActivity, idx) && pActivity)
                             {
                                 TA_Variant var = (*pActivity)();
                                 TA_Connection::active(this, &TA_ThreadPool::taskCompleted, pActivity->id(), var);
@@ -132,12 +133,14 @@ namespace CoreAsync {
             }
         }
 
-        bool trySteal(TA_BasicActivity *&stolenActivity)
+        bool trySteal(TA_BasicActivity *&stolenActivity, std::size_t excludedIdx)
         {
             std::uniform_int_distribution<std::size_t> distribution(0, m_states.size() - 1);
             for (std::size_t i = 0; i < m_states.size(); ++i)
             {
                 std::size_t targetIndex = distribution(m_randomGenerator) % m_states.size();
+                if (targetIndex == excludedIdx)
+                    continue;
                 if (!m_activityQueues[targetIndex].isEmpty())
                 {
                     if(m_activityQueues[targetIndex].pop(stolenActivity))

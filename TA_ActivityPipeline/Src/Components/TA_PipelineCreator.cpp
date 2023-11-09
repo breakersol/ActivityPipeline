@@ -51,14 +51,14 @@ namespace CoreAsync {
         return pHolder;
     }
 
-    TA_MainPipelineHolder<TA_PipelineHolder<TA_ParallelPipeline> > * TA_PipelineCreator::createParallelPipeline()
+    TA_MainPipelineHolder<TA_PipelineHolder<TA_ConcurrentPipeline> > * TA_PipelineCreator::createConcurrentPipeline()
     {
-        auto pHolder = new TA_PipelineHolder<TA_ParallelPipeline>();
+        auto pHolder = new TA_PipelineHolder<TA_ConcurrentPipeline>();
         m_holderList.push_back(pHolder);
         return pHolder;
     }
 
-    TA_MainPipelineHolder<TA_PipelineHolder<TA_ManualChainPipeline> > * TA_PipelineCreator::createManaualChainPipeline()
+    TA_MainPipelineHolder<TA_PipelineHolder<TA_ManualChainPipeline> > * TA_PipelineCreator::createManualChainPipeline()
     {
         auto pHolder = new TA_PipelineHolder<TA_ManualChainPipeline>();
         m_holderList.push_back(pHolder);

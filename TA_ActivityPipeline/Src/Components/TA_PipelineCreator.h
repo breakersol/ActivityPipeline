@@ -28,7 +28,7 @@ namespace CoreAsync {
     public:
         using AutoChainHolder = TA_MainPipelineHolder<TA_PipelineHolder<TA_AutoChainPipeline> >;
         using ManualChainHolder = TA_MainPipelineHolder<TA_PipelineHolder<TA_ManualChainPipeline> >;
-        using ParallelHolder = TA_MainPipelineHolder<TA_PipelineHolder<TA_ParallelPipeline> >;
+        using ConcurrentHolder = TA_MainPipelineHolder<TA_PipelineHolder<TA_ConcurrentPipeline> >;
         using ManualStepsChainHolder = TA_MainPipelineHolder<TA_PipelineHolder<TA_ManualStepsChainPipeline> >;
         using ManualKeyActivityChainHolder = TA_MainPipelineHolder<TA_PipelineHolder<TA_ManualKeyActivityChainPipeline> >;
 
@@ -42,8 +42,8 @@ namespace CoreAsync {
         TA_PipelineCreator & operator = (const TA_PipelineCreator &creator) = delete;
 
         AutoChainHolder * createAutoChainPipeline();
-        ManualChainHolder * createManaualChainPipeline();
-        ParallelHolder * createParallelPipeline();
+        ManualChainHolder * createManualChainPipeline();
+        ConcurrentHolder * createConcurrentPipeline();
         ManualStepsChainHolder * createManualStepsChainPipeline();
         ManualKeyActivityChainHolder * createManualKeyActivityChainPipeline();
 
@@ -51,7 +51,7 @@ namespace CoreAsync {
         TA_PipelineCreator();  
 
     private:
-        using HolderVar = std::variant<AutoChainHolder *, ManualChainHolder *, ParallelHolder *, ManualStepsChainHolder *, ManualKeyActivityChainHolder *>;
+        using HolderVar = std::variant<AutoChainHolder *, ManualChainHolder *, ConcurrentHolder *, ManualStepsChainHolder *, ManualKeyActivityChainHolder *>;
 
         std::list<HolderVar> m_holderList;
 

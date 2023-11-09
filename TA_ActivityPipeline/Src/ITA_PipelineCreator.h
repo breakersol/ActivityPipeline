@@ -23,9 +23,9 @@ namespace CoreAsync {
     class ITA_PipelineCreator
     {
     public:
-        static TA_PipelineCreator::ParallelHolder * createParallelPipeline()
+        static TA_PipelineCreator::ConcurrentHolder * createConcurrentPipeline()
         {
-            return TA_PipelineCreator::GetInstance().createParallelPipeline();
+            return TA_PipelineCreator::GetInstance().createConcurrentPipeline();
         }
 
         static TA_PipelineCreator::AutoChainHolder * createAutoChainPipeline()
@@ -33,9 +33,9 @@ namespace CoreAsync {
             return TA_PipelineCreator::GetInstance().createAutoChainPipeline();
         }
 
-        static TA_PipelineCreator::ManualChainHolder * createManaualChainPipeline()
+        static TA_PipelineCreator::ManualChainHolder * createManualChainPipeline()
         {
-            return TA_PipelineCreator::GetInstance().createManaualChainPipeline();
+            return TA_PipelineCreator::GetInstance().createManualChainPipeline();
         }
 
         static TA_PipelineCreator::ManualStepsChainHolder * createManualStepsChainPipeline()
